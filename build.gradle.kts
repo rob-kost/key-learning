@@ -68,6 +68,12 @@ kotlin {
     jvmToolchain(21)
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 // Настройка ktlint
 ktlint {
     version.set("1.1.1") // версия ktlint

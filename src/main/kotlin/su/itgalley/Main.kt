@@ -17,7 +17,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 // 1. Определяем таблицу Exposed
 object HelloTable : Table("hello") {
     val id = integer("id")
-    val message = varchar("message", 255)
+    const val len = 255
+    val message = varchar("message", len)
 }
 
 // 2. Data class для JSON
@@ -53,8 +54,9 @@ fun main() {
         )
 
     // Запускаем сервер на порту 8080
-    val server = app.asServer(Jetty(8080)).start()
-    println("Server started on http://localhost:8080/hello")
+    val port = 9000
+    val server = app.asServer(Jetty(port)).start()
+    println("Server started on http://localhost:{port}/hello")
     println("Press ENTER to stop")
     Thread.sleep(Long.MAX_VALUE)
     server.stop()

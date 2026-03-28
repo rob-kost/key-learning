@@ -1,4 +1,4 @@
-package com.example
+package su.itgalley
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
