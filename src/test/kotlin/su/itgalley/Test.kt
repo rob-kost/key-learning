@@ -12,7 +12,6 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
-import su.itgalley.HelloResponse
 
 class Test : StringSpec({
 
@@ -27,7 +26,7 @@ class Test : StringSpec({
             )
 
         // Запускаем тестовый сервер
-        val server = fakeApp.asServer(Jetty(0)).start()
+        val server = fakeApp.asServer(Jetty(9000)).start()
         val client = ApacheClient()
 
         val request = Request(Method.GET, "http://localhost:${server.port()}/hello")
