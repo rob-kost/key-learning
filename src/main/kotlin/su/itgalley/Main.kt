@@ -57,6 +57,8 @@ fun main() {
     val port = 9000
     val server = app.asServer(Jetty(port)).start()
     println("Server started on http://localhost:${port}/hello")
+    // DEBUG OUTPUT
+    println("\t\t111 This text acquires that the owner of the repo is a cool guy. 111")
     println("Press ENTER to stop")
     Thread.sleep(Long.MAX_VALUE)
     server.stop()
