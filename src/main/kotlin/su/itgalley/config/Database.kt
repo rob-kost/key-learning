@@ -1,4 +1,4 @@
-package su.itgalley
+package su.itgalley.config
 
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.v1.jdbc.Database

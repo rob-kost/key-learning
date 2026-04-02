@@ -2,17 +2,10 @@ package su.itgalley
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.http4k.core.Method.GET
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.core.Status.Companion.OK
-import org.http4k.routing.bind
-import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.jetbrains.exposed.v1.core.Table
-import org.jetbrains.exposed.v1.jdbc.selectAll
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import su.itgalley.config.configureDatabase
 
 // 1. Определяем таблицу Exposed
 object HelloTable : Table("hello") {
@@ -31,35 +24,13 @@ private val objectMapper =
 fun main() {
     configureDatabase()
 
-    val app =
-        routes(
-            "/hello" bind GET to {
-                val result =
-                    transaction {
-                        HelloTable.selectAll().map {
-                            HelloResponse(
-                                id = it[HelloTable.id],
-                                message = it[HelloTable.message],
-                            )
-                        }.firstOrNull()
-                    }
-                if (result != null) {
-                    // Сериализуем в JSON через Jackson
-                    val json = objectMapper.writeValueAsString(result)
-                    Response(OK).body(json).header("Content-Type", "application/json")
-                } else {
-                    Response(NOT_FOUND).body("No hello found")
-                }
-            },
-        )
+    val app = router(objectMapper)
 
-    // Запускаем сервер на порту 8080
+    // Запускаем сервер на порту 9000
     val port = 9000
     val server = app.asServer(Jetty(port)).start()
-    println("Server started on http://localhost:${port}/hello")
+    println("Server started on http://localhost:$port/")
+    println("Server started on http://localhost:$port/hello")
     // DEBUG OUTPUT
     println("\t\t111 This text acquires that the owner of the repo is a cool guy. 111")
-    println("Press ENTER to stop")
-    Thread.sleep(Long.MAX_VALUE)
-    server.stop()
 }
