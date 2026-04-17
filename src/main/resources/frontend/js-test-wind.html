@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Последняя нажатая клавиша</title>
+    <style>
+        /* Немного стилей для приятного вида */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3rem 4rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+            font-weight: 300;
+        }
+
+        .key-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            background: #ecf0f1;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            margin: 1.5rem 0;
+            min-width: 300px;
+            border: 2px dashed #7f8c8d;
+            transition: all 0.1s ease;
+        }
+
+        .hint {
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .hint kbd {
+            background: #f8f9fa;
+            border: 1px solid #adb5bd;
+            border-radius: 6px;
+            padding: 2px 6px;
+            margin: 0 2px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⌨️ Нажмите любую клавишу</h1>
+        <!-- Блок для вывода последней нажатой клавиши -->
+        <div id="lastKey" class="key-display">—</div>
+        <p class="hint">
+            Попробуйте сочетания: <kbd>Ctrl</kbd> + <kbd>C</kbd>,
+            <kbd>Shift</kbd> + <kbd>A</kbd>, <kbd>Alt</kbd> + <kbd>F4</kbd> и другие.
+        </p>
+    </div>
+
+    <!-- Подключаем внешний JavaScript-файл -->
+    <script src="js-test-code.js"></script>
+</body>
+</html>
