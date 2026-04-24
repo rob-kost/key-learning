@@ -1,45 +1,50 @@
-package su.itgalley
+package su.itgalley.database.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.FlywayException
 import org.jetbrains.exposed.v1.jdbc.Database
 import kotlin.system.exitProcess
-
 
 data class DbConfig(
     val url: String,
     val username: String,
     val password: String,
-    val poolSize: Int = 20
+    val poolSize: Int = 20,
 )
 
-
 object DatabaseConfig {
+    private const val CONNECTION_TIMEOUT_MS = 30_000L
     private lateinit var dataSource: HikariDataSource
 
-    fun init(config: DbConfig, validateSchema: Boolean = true) {
-        val hikariConfig = HikariConfig().apply {
-            jdbcUrl = config.url
-            username = config.username
-            password = config.password
-            driverClassName = "org.mariadb.jdbc.Driver"
-            maximumPoolSize = config.poolSize
-            connectionTimeout = 30000
-            transactionIsolation = "TRANSACTION_READ_COMMITTED"
-            addDataSourceProperty("cachePrepStmts", "true")
-            addDataSourceProperty("prepStmtCacheSize", "250")
-            addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
-        }
+    fun init(
+        config: DbConfig,
+        validateSchema: Boolean = true,
+    ) {
+        val hikariConfig =
+            HikariConfig().apply {
+                jdbcUrl = config.url
+                username = config.username
+                password = config.password
+                driverClassName = "org.mariadb.jdbc.Driver"
+                maximumPoolSize = config.poolSize
+                connectionTimeout = CONNECTION_TIMEOUT_MS
+                transactionIsolation = "TRANSACTION_READ_COMMITTED"
+                addDataSourceProperty("cachePrepStmts", "true")
+                addDataSourceProperty("prepStmtCacheSize", "250")
+                addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
+            }
 
         dataSource = HikariDataSource(hikariConfig)
 
         Database.connect(dataSource)
 
-        val flyway = Flyway.configure()
-            .dataSource(dataSource)
-            .locations("classpath:su/itgalley/db/migrations")
-            .load()
+        val flyway =
+            Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:su/itgalley/db/migrations")
+                .load()
 
         if (validateSchema) {
             validateDatabaseSchema(flyway)
@@ -66,11 +71,9 @@ object DatabaseConfig {
                 println("There are $numPending pending migrations!")
                 println("Run FlywayMigrator to apply migrations before starting the application.")
             }
-
-        } catch (e: Exception) {
+        } catch (e: FlywayException) {
             println("Database schema validation FAILED: ${e.message}")
             exitProcess(1)
-
         }
     }
 
