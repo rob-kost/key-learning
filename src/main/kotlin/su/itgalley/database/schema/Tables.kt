@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
-
 package su.itgalley.database.schema
 
 import org.jetbrains.exposed.v1.core.ReferenceOption
@@ -8,9 +6,9 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.isNotNull
 import org.jetbrains.exposed.v1.core.isNull
+import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.core.or
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
+import java.util.UUID
 
 @Suppress("EnumNaming", "ktlint:standard:enum-entry-name-case")
 enum class KeyGroup { `управляющие клавиши`, `печатные клавиши` }
@@ -22,7 +20,7 @@ enum class RequiredInBlock { Yes, No }
 enum class SolutionType { hotkey, typing }
 
 object Blocks : Table("blocks") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val name = varchar("name", 128).uniqueIndex()
     val description = text("description").nullable()
 
@@ -30,13 +28,13 @@ object Blocks : Table("blocks") {
 }
 
 object Combinations : Table("combinations") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
 
     override val primaryKey = PrimaryKey(id)
 }
 
 object HotKeys : Table("hotkeys") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val blockId = reference("block_id", Blocks.id, onDelete = ReferenceOption.CASCADE)
     val description = text("description")
     val keyCombinationId = reference("key_combination_id", Combinations.id, onDelete = ReferenceOption.CASCADE)
@@ -50,7 +48,7 @@ object HotKeys : Table("hotkeys") {
 }
 
 object KeysTable : Table("keys") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val key = varchar("key", 64).uniqueIndex()
     val keyGroup = enumerationByName("key_group", 50, KeyGroup::class)
 
@@ -58,7 +56,7 @@ object KeysTable : Table("keys") {
 }
 
 object CombinationKeys : Table("combination_keys") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val combinationId = reference("combination_id", Combinations.id, onDelete = ReferenceOption.CASCADE)
     val keyId = reference("key_id", KeysTable.id, onDelete = ReferenceOption.RESTRICT)
     val position = integer("position")
@@ -72,28 +70,28 @@ object CombinationKeys : Table("combination_keys") {
 }
 
 object Tutorials : Table("tutorials") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val content = text("content")
 
     override val primaryKey = PrimaryKey(id)
 }
 
 object Tasks : Table("tasks") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val description = text("description")
 
     override val primaryKey = PrimaryKey(id)
 }
 
 object LevelHelps : Table("level_helps") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val content = text("content")
 
     override val primaryKey = PrimaryKey(id)
 }
 
 object Levels : Table("levels") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val name = varchar("name", 128)
     val blockId = reference("block_id", Blocks.id, onDelete = ReferenceOption.CASCADE)
     val position = integer("position")
@@ -111,7 +109,7 @@ object Levels : Table("levels") {
 }
 
 object Subtasks : Table("subtasks") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val description = text("description")
     val solutionType = enumerationByName("solution_type", 20, SolutionType::class)
     val stringSolution = text("string_solution").nullable()
@@ -132,7 +130,7 @@ object Subtasks : Table("subtasks") {
 }
 
 object TaskSubtasks : Table("task_subtasks") {
-    val id = uuid("id").clientDefault { Uuid.random() }
+    val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val taskId = reference("task_id", Tasks.id, onDelete = ReferenceOption.CASCADE)
     val subtaskId = reference("subtask_id", Subtasks.id, onDelete = ReferenceOption.CASCADE)
     val position = integer("position")
