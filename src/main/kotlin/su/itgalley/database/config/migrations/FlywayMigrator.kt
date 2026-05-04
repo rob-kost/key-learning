@@ -62,12 +62,29 @@ private fun createFlyway(config: DbConfig): Flyway =
         .cleanDisabled(false)
         .load()
 
+private fun printHelp() {
+    println("Database Migration Tool")
+    println("Usage: ./gradlew FlywayMigrator --args=[command]")
+    println("Available commands: migrate, info, repair, clean")
+}
+
+private fun printError() {
+    println("Incorrect command")
+    println("Usage: ./gradlew FlywayMigrator --args=[command]")
+    println("Available commands: migrate, info, repair, clean")
+}
+
 private fun executeCommand(
     flyway: Flyway,
     command: String?,
     dbName: String,
 ) {
     try {
+        if (command.isNullOrBlank()) {
+            printHelp()
+            return
+        }
+
         println("Running Flyway command: $command on $dbName")
 
         when (command) {
@@ -97,11 +114,7 @@ private fun executeCommand(
                     println("Canceled")
                 }
             }
-            else -> {
-                println("Database Migration Tool")
-                println("Usage: ./gradlew FlywayMigrator --args=[command]")
-                println("Available commands: migrate, info, repair, clean")
-            }
+            else -> printError()
         }
     } catch (e: FlywayException) {
         println("FATAL (Flyway): ${e.message}")
