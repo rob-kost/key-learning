@@ -56,7 +56,7 @@ dependencies {
 
     // Flyway (миграции БД)
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.flywaydb:flyway-mysql:${flywayVersion}")
+    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
     // Тестирование
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
