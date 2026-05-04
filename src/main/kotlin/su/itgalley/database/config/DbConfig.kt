@@ -43,7 +43,7 @@ object DatabaseConfig {
         val flyway =
             Flyway.configure()
                 .dataSource(dataSource)
-                .locations("classpath:su/itgalley/db/migrations")
+                .locations("classpath:db/migrations")
                 .load()
 
         if (validateSchema) {
