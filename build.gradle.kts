@@ -3,7 +3,6 @@ plugins {
     kotlin("jvm") version "2.3.20"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
-    id("org.flywaydb.flyway") version "12.2.0"
 }
 
 application {
@@ -26,6 +25,7 @@ val mockkVersion = "1.14.9"
 val detectVersion = "1.23.8"
 val ktlintVersion = "12.1.0"
 val logbackVersion = "1.5.16"
+val mariaDBVersion = "3.5.8"
 
 dependencies {
 
@@ -37,6 +37,9 @@ dependencies {
     implementation("org.http4k:http4k-server-jetty:$http4kVersion")
     implementation("org.http4k:http4k-client-apache:$http4kVersion")
     implementation("org.http4k:http4k-format-jackson:$http4kVersion")
+
+    // Драйвер для MariaDB
+    implementation("org.mariadb.jdbc:mariadb-java-client:$mariaDBVersion")
 
     // Exposed ORM
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
@@ -88,4 +91,20 @@ ktlint {
 detekt {
     config.setFrom("detekt.yml") // при необходимости кастомный конфиг
     buildUponDefaultConfig = true
+}
+
+tasks.register<JavaExec>("FlywayMigrator") {
+    group = "database"
+    description = "Запуск утилиты миграции базы данных"
+
+    mainClass.set("su.itgalley.database.config.migrations.FlywayMigratorKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    workingDir = project.projectDir
+
+    val argsList = mutableListOf<String>()
+    if (project.hasProperty("args")) {
+        val customArgs = project.property("args").toString().split(" ").filter { it.isNotBlank() }
+        argsList.addAll(customArgs)
+    }
+    args = argsList
 }
