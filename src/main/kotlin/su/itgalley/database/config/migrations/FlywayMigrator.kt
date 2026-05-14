@@ -102,7 +102,7 @@ private fun executeCommand(
             "repair" -> {
                 // выполняет синхронизацию
                 flyway.repair()
-                println("Schema history repaired (checksums aligned).")
+                println("Schema history repaired (checksums aligned)")
             }
             "clean" -> {
                 // полностью очищает базу данных
