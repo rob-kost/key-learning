@@ -8,8 +8,8 @@ data class LevelDto(
     val name: String,
     val blockId: UUID,
     val position: Int,
-    val tutorialId: UUID,
+    val tutorialId: UUID?,
     val taskId: UUID,
-    val levelHelpId: UUID,
+    val levelHelpId: UUID?,
     val requiredInBlock: RequiredInBlock,
 )
