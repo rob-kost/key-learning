@@ -7,6 +7,6 @@ data class SubTaskDto(
     val id: UUID,
     val description: String,
     val solutionType: SolutionType,
-    val stringSolution: String,
-    val keySolutionId: UUID,
+    val stringSolution: String?,
+    val keySolutionId: UUID?,
 )

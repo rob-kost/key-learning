@@ -4,7 +4,7 @@ import java.util.UUID
 
 data class HotKeyDto(
     val id: UUID,
-    val blockId: Int,
+    val blockId: UUID,
     val description: String,
     val keyCombinationId: UUID,
 )
