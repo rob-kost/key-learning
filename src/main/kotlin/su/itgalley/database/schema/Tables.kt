@@ -10,14 +10,11 @@ import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.core.or
 import java.util.UUID
 
-@Suppress("EnumNaming", "ktlint:standard:enum-entry-name-case")
-enum class KeyGroup { `управляющие клавиши`, `печатные клавиши` }
+enum class KeyGroup { CONTROLS, SYMBOLS }
 
-@Suppress("EnumNaming", "ktlint:standard:enum-entry-name-case")
-enum class RequiredInBlock { Yes, No }
+enum class RequiredInBlock { YES, NO }
 
-@Suppress("EnumNaming", "ktlint:standard:enum-entry-name-case")
-enum class SolutionType { hotkey, typing }
+enum class SolutionType { HOTKEY, TYPING }
 
 object Blocks : Table("blocks") {
     val id = javaUUID("id").clientDefault { UUID.randomUUID() }
@@ -98,7 +95,7 @@ object Levels : Table("levels") {
     val tutorialId = reference("tutorial_id", Tutorials.id, onDelete = ReferenceOption.SET_NULL).nullable()
     val taskId = reference("task_id", Tasks.id, onDelete = ReferenceOption.CASCADE)
     val levelHelpId = reference("level_help_id", LevelHelps.id, onDelete = ReferenceOption.SET_NULL).nullable()
-    val requiredInBlock = enumerationByName("required_in_block", 10, RequiredInBlock::class).default(RequiredInBlock.No)
+    val requiredInBlock = enumerationByName("required_in_block", 10, RequiredInBlock::class).default(RequiredInBlock.NO)
 
     override val primaryKey = PrimaryKey(id)
 
@@ -119,12 +116,12 @@ object Subtasks : Table("subtasks") {
 
     init {
         check("chk_subtask_solution") {
-            (solutionType eq SolutionType.typing and stringSolution.isNotNull()) or
-                (solutionType eq SolutionType.hotkey and keySolutionId.isNotNull())
+            (solutionType eq SolutionType.TYPING and stringSolution.isNotNull()) or
+                (solutionType eq SolutionType.HOTKEY and keySolutionId.isNotNull())
         }
         check("chk_subtask_clean_other_solution") {
-            (solutionType eq SolutionType.typing and keySolutionId.isNull()) and
-                (solutionType eq SolutionType.hotkey and stringSolution.isNull())
+            (solutionType eq SolutionType.TYPING and keySolutionId.isNull()) and
+                (solutionType eq SolutionType.HOTKEY and stringSolution.isNull())
         }
     }
 }

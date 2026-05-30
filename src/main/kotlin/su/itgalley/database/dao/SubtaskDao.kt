@@ -1,8 +1,8 @@
 package su.itgalley.database.dao
 
 import org.jetbrains.exposed.v1.core.ResultRow
-import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
@@ -11,8 +11,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import su.itgalley.database.schema.Levels
 import su.itgalley.database.schema.Subtasks
-import su.itgalley.database.schema.Tasks
 import su.itgalley.database.schema.TaskSubtasks
+import su.itgalley.database.schema.Tasks
 import su.itgalley.dto.SubTaskDto
 import java.util.UUID
 
@@ -65,20 +65,22 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
         }
 
     // получить список подзадач по задаче (id)
-    fun getSubtasksByTask(levelId: UUID): List<SubTaskDto> = transaction {
-        (Tasks innerJoin TaskSubtasks innerJoin Subtasks)
-            .select(Tasks.id eq levelId)
-            .orderBy(TaskSubtasks.position to SortOrder.ASC)
-            .map { rowToSubtask(it) }
-    }
+    fun getSubtasksByTask(levelId: UUID): List<SubTaskDto> =
+        transaction {
+            (Tasks innerJoin TaskSubtasks innerJoin Subtasks)
+                .select(Tasks.id eq levelId)
+                .orderBy(TaskSubtasks.position to SortOrder.ASC)
+                .map { rowToSubtask(it) }
+        }
 
     // получить список подзадач по уровню (id)
-    fun getSubtasksByLevel(levelId: UUID): List<SubTaskDto> = transaction {
-        (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
-            .select(Levels.id eq levelId)
-            .orderBy(TaskSubtasks.position to SortOrder.ASC)
-            .map { rowToSubtask(it) }
-    }
+    fun getSubtasksByLevel(levelId: UUID): List<SubTaskDto> =
+        transaction {
+            (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
+                .select(Levels.id eq levelId)
+                .orderBy(TaskSubtasks.position to SortOrder.ASC)
+                .map { rowToSubtask(it) }
+        }
 
     fun rowToSubtask(row: ResultRow): SubTaskDto =
         SubTaskDto(
