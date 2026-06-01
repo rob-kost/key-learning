@@ -44,7 +44,8 @@ fun main() {
     val hotKeyDao = HotKeyDao()
 
     // Создание роутера
-    val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao)
+//    val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao)
+    val app = createRouter()
 
     // Запуск сервера
     val port = 9000

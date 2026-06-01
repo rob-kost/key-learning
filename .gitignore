@@ -15,6 +15,10 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.idea/dataSources.local.xml
+.idea/dataSources.xml
+.idea/dataSources/
+.idea/detekt.xml
 
 ### Kotlin ###
 .kotlin
