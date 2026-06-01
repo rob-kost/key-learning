@@ -1,7 +1,5 @@
 -- нельзя положить в уровень задачу, если внутри неё есть подзадачи с хоткеями из другого блока
 
-DELIMITER //
-
 -- Проверяет соответствие блоков в Levels и HotKeys при создании нового уровня
 DROP TRIGGER IF EXISTS trg_check_levels_block_insert;
 CREATE TRIGGER trg_check_levels_block_insert
@@ -24,7 +22,7 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ошибка (Levels INSERT): Задача содержит подзадачи с HotKey из другого блока';
     END IF;
-END; //
+END;
 
 -- Проверяет соответствие блоков в Levels и HotKeys при изменении уровня
 DROP TRIGGER IF EXISTS trg_check_levels_block_update;
@@ -48,6 +46,4 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ошибка (Levels UPDATE): Задача содержит подзадачи с HotKey из другого блока';
     END IF;
-END; //
-
-DELIMITER ;
+END;

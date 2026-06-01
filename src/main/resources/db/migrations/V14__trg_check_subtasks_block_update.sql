@@ -1,7 +1,5 @@
 -- если подзадача уже находится в блоке А, ты не можешь поменять её решение на комбинацию из блока В
 
-DELIMITER //
-
 -- Проверяет соответствие блоков в Levels и HotKeys при изменении подзадачи
 DROP TRIGGER IF EXISTS trg_check_subtasks_block_update;
 CREATE TRIGGER trg_check_subtasks_block_update
@@ -25,6 +23,4 @@ BEGIN
                 SET MESSAGE_TEXT = 'Ошибка (Subtasks UPDATE): Новый HotKey принадлежит другому блоку, а подзадача уже привязана к уровню';
         END IF;
     END IF;
-END; //
-
-DELIMITER ;
+END;

@@ -108,4 +108,5 @@ tasks.register<JavaExec>("FlywayMigrator") {
         argsList.addAll(customArgs)
     }
     args = argsList
+    standardInput = System.`in`
 }
