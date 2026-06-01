@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Levels (
     tutorial_id UUID NULL COMMENT 'Ссылка на туториал',
     task_id UUID NOT NULL COMMENT 'Ссылка на задание',
     level_help_id UUID NULL COMMENT 'Ссылка на справочный материал уровня',
-    required_in_block ENUM('Yes', 'No') NOT NULL DEFAULT 'No' COMMENT 'Индикатор обязательного уровня для прохождения в блоке',
+    required_in_block ENUM('YES', 'NO') NOT NULL DEFAULT 'NO' COMMENT 'Индикатор обязательного уровня для прохождения в блоке',
     -- если удаляем блок в Blocks, то в таблице Levels удалятся все связанные записи
     FOREIGN KEY (block_id) REFERENCES Blocks(id) ON DELETE CASCADE,
     -- если удаляем туториал в Tutorials, то в таблице Levels все связанные записи остаются, но у них обнуляется tutorial_id

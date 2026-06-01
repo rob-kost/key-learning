@@ -66,12 +66,13 @@ class CombinationKeyDao : BaseDao<CombinationKeyDto, UUID> {
         }
 
     // Получить combinationId по клавише
-    fun getCombinationIdsByKey(keyValue: String): List<UUID> = transaction {
-        (CombinationKeys innerJoin KeysTable)
-            .select(KeysTable.key eq keyValue)
-            .map { it[CombinationKeys.combinationId] }
-            .distinct()
-    }
+    fun getCombinationIdsByKey(keyValue: String): List<UUID> =
+        transaction {
+            (CombinationKeys innerJoin KeysTable)
+                .select(KeysTable.key eq keyValue)
+                .map { it[CombinationKeys.combinationId] }
+                .distinct()
+        }
 
     private fun rowToCombinationKey(row: ResultRow): CombinationKeyDto =
         CombinationKeyDto(
