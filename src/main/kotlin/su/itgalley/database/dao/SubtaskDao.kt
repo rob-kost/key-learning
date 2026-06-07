@@ -90,4 +90,17 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
             stringSolution = row[Subtasks.stringSolution],
             keySolutionId = row[Subtasks.keySolutionId],
         )
+
+    // Метод для получения всех подзадач уровня с сортировкой
+    fun getSubtasksByLevelWithPosition(levelId: UUID): List<Pair<SubTaskDto, Int>> = transaction {
+        (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
+            .select(Levels.id eq levelId)
+            .orderBy(TaskSubtasks.position to SortOrder.ASC)
+            .map { row ->
+                Pair(
+                    rowToSubtask(row),
+                    row[TaskSubtasks.position],
+                )
+            }
+    }
 }

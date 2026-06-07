@@ -1,18 +1,16 @@
 package su.itgalley.database.dao
 
 import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.jdbc.deleteWhere
-import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.select
-import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.update
+import su.itgalley.database.schema.CombinationKeys
 import su.itgalley.database.schema.HotKeys
-import su.itgalley.database.schema.Subtasks
-import su.itgalley.database.schema.TaskSubtasks
+import su.itgalley.database.schema.KeysTable
 import su.itgalley.dto.HotKeyDto
-import java.util.UUID
+import su.itgalley.dto.KeyWithPosition
+import java.util.*
 
 class HotKeyDao : BaseDao<HotKeyDto, UUID> {
     override fun findById(id: UUID): HotKeyDto? =
@@ -48,25 +46,6 @@ class HotKeyDao : BaseDao<HotKeyDto, UUID> {
 
     override fun deleteById(id: UUID): Boolean = transaction { HotKeys.deleteWhere { HotKeys.id eq id } > 0 }
 
-    // Получить все горячие клавиши блока
-    fun findByBlock(blockId: UUID): List<HotKeyDto> =
-        transaction {
-            HotKeys.select(HotKeys.blockId eq blockId)
-                .map { rowToHotKey(it) }
-        }
-
-    // Получить список хоткеев из подзадач для конкретной задачи
-    fun getHotkeysByTask(taskId: UUID): List<HotKeyDto> =
-        transaction {
-            (
-                HotKeys
-                    .innerJoin(Subtasks).innerJoin(TaskSubtasks)
-            )
-                .select(TaskSubtasks.taskId eq taskId)
-                .withDistinct()
-                .map { rowToHotKey(it) }
-        }
-
     private fun rowToHotKey(row: ResultRow): HotKeyDto =
         HotKeyDto(
             id = row[HotKeys.id],
@@ -74,4 +53,16 @@ class HotKeyDao : BaseDao<HotKeyDto, UUID> {
             description = row[HotKeys.description],
             keyCombinationId = row[HotKeys.keyCombinationId],
         )
+
+    fun getKeysForCombination(combinationId: UUID): List<KeyWithPosition> = transaction {
+        (CombinationKeys innerJoin KeysTable)
+            .select(CombinationKeys.combinationId eq combinationId)
+            .orderBy(CombinationKeys.position to SortOrder.ASC)
+            .map { row ->
+                KeyWithPosition(
+                    key = row[KeysTable.key],
+                    position = row[CombinationKeys.position],
+                )
+            }
+    }
 }

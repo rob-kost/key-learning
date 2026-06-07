@@ -10,6 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import su.itgalley.database.schema.Levels
+import su.itgalley.database.schema.Tasks
 import su.itgalley.dto.LevelDto
 import java.util.UUID
 
@@ -74,4 +75,12 @@ class LevelDao : BaseDao<LevelDto, UUID> {
             levelHelpId = row[Levels.levelHelpId],
             requiredInBlock = row[Levels.requiredInBlock],
         )
+
+    fun getLevelTaskDescription(levelId: UUID): String? =
+        transaction {
+            (Levels innerJoin Tasks)
+                .select(Levels.id eq levelId)
+                .map { it[Tasks.description] }
+                .singleOrNull()
+        }
 }
