@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: net.bytebuddy:byte-buddy:1.18.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="net.bytebuddy" artifactId="byte-buddy" version="1.18.2" baseVersion="1.18.2" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.18.2/7ac991b4bd502e2567efcdecc0d2e9b3f7dd3859/byte-buddy-1.18.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

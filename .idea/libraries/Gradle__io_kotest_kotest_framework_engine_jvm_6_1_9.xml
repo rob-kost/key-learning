@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: io.kotest:kotest-framework-engine-jvm:6.1.9" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.kotest" artifactId="kotest-framework-engine-jvm" version="6.1.9" baseVersion="6.1.9" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/io.kotest/kotest-framework-engine-jvm/6.1.9/41e5dd514f21b9707ada2db90c19b5857a912ce5/kotest-framework-engine-jvm-6.1.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

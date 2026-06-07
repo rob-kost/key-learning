@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: io.github.pdvrieze.xmlutil:serialization-jvm:0.91.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.github.pdvrieze.xmlutil" artifactId="serialization-jvm" version="0.91.3" baseVersion="0.91.3" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/io.github.pdvrieze.xmlutil/serialization-jvm/0.91.3/816d18866918d5e20376070d188d0e0dc3cceb1b/serialization-jvm-0.91.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

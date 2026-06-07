@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.7.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="kotlinx-io-core-jvm" version="0.7.0" baseVersion="0.7.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-io-core-jvm/0.7.0/1d9595ed390f6304ce90a049e6b2f1fab3b408c4/kotlinx-io-core-jvm-0.7.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

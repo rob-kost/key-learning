@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.httpcomponents.core5:httpcore5-h2:5.4" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.httpcomponents.core5" artifactId="httpcore5-h2" version="5.4" baseVersion="5.4" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents.core5/httpcore5-h2/5.4/83cdd62ef3140664f46be59c2c2727141d1c5a32/httpcore5-h2-5.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

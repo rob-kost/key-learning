@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.eclipse.jetty.websocket:jetty-websocket-jetty-api:12.1.7" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.eclipse.jetty.websocket" artifactId="jetty-websocket-jetty-api" version="12.1.7" baseVersion="12.1.7" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/jetty-websocket-jetty-api/12.1.7/ccd87435cfb3fa10abf9188cd83a26ae1563d0d8/jetty-websocket-jetty-api-12.1.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

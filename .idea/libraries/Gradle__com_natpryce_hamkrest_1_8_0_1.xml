@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.natpryce:hamkrest:1.8.0.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.natpryce" artifactId="hamkrest" version="1.8.0.1" baseVersion="1.8.0.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/com.natpryce/hamkrest/1.8.0.1/3d4ddf20e8063c6ca62289e8a9864e90653af980/hamkrest-1.8.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

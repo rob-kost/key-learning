@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.http4k:http4k-server-jetty:6.38.0.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.http4k" artifactId="http4k-server-jetty" version="6.38.0.0" baseVersion="6.38.0.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Херня для универа/ПромРазработка/gradle-training/money-library/.gradle/caches/modules-2/files-2.1/org.http4k/http4k-server-jetty/6.38.0.0/dc3f9ec591dc836d3b84e8193c3e0cbab6592396/http4k-server-jetty-6.38.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

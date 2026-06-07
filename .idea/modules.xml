@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Проект_по_программной_инженерии.iml" filepath="$PROJECT_DIR$/.idea/modules/Проект_по_программной_инженерии.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Проект_по_программной_инженерии.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Проект_по_программной_инженерии.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Проект_по_программной_инженерии.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Проект_по_программной_инженерии.test.iml" />
+    </modules>
+  </component>
+</project>
