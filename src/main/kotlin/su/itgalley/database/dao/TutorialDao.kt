@@ -15,7 +15,7 @@ import java.util.UUID
 class TutorialDao : BaseDao<TutorialDto, UUID> {
     override fun findById(id: UUID): TutorialDto? =
         transaction {
-            Tutorials.select(Tutorials.id eq id)
+            Tutorials.selectAll().where { Tutorials.id eq id }
                 .map { rowToTutorial(it) }
                 .singleOrNull()
         }

@@ -19,7 +19,7 @@ import java.util.UUID
 class SubtaskDao : BaseDao<SubTaskDto, UUID> {
     override fun findById(id: UUID): SubTaskDto? =
         transaction {
-            Subtasks.select(Subtasks.id eq id)
+            Subtasks.selectAll().where { Subtasks.id eq id }
                 .map { rowToSubtask(it) }
                 .singleOrNull()
         }
@@ -59,7 +59,7 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
                 Subtasks
                     .innerJoin(TaskSubtasks).innerJoin(Tasks).innerJoin(Levels)
             )
-                .select(Levels.blockId eq blockId)
+                .selectAll().where { Levels.blockId eq blockId }
                 .withDistinct() // чтобы избежать дубликатов подзадач
                 .map { rowToSubtask(it) }
         }
@@ -68,7 +68,7 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
     fun getSubtasksByTask(levelId: UUID): List<SubTaskDto> =
         transaction {
             (Tasks innerJoin TaskSubtasks innerJoin Subtasks)
-                .select(Tasks.id eq levelId)
+                .selectAll().where { Tasks.id eq levelId }
                 .orderBy(TaskSubtasks.position to SortOrder.ASC)
                 .map { rowToSubtask(it) }
         }
@@ -77,7 +77,7 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
     fun getSubtasksByLevel(levelId: UUID): List<SubTaskDto> =
         transaction {
             (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
-                .select(Levels.id eq levelId)
+                .selectAll().where { Levels.id eq levelId }
                 .orderBy(TaskSubtasks.position to SortOrder.ASC)
                 .map { rowToSubtask(it) }
         }
@@ -94,7 +94,7 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
     // Метод для получения всех подзадач уровня с сортировкой
     fun getSubtasksByLevelWithPosition(levelId: UUID): List<Pair<SubTaskDto, Int>> = transaction {
         (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
-            .select(Levels.id eq levelId)
+            .selectAll().where { Levels.id eq levelId }
             .orderBy(TaskSubtasks.position to SortOrder.ASC)
             .map { row ->
                 Pair(

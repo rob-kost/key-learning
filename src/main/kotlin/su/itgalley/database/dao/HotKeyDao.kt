@@ -15,7 +15,7 @@ import java.util.*
 class HotKeyDao : BaseDao<HotKeyDto, UUID> {
     override fun findById(id: UUID): HotKeyDto? =
         transaction {
-            HotKeys.select(HotKeys.id eq id)
+            HotKeys.selectAll().where { HotKeys.id eq id }
                 .map { rowToHotKey(it) }
                 .singleOrNull()
         }
@@ -56,7 +56,7 @@ class HotKeyDao : BaseDao<HotKeyDto, UUID> {
 
     fun getKeysForCombination(combinationId: UUID): List<KeyWithPosition> = transaction {
         (CombinationKeys innerJoin KeysTable)
-            .select(CombinationKeys.combinationId eq combinationId)
+            .selectAll().where { CombinationKeys.combinationId eq combinationId }
             .orderBy(CombinationKeys.position to SortOrder.ASC)
             .map { row ->
                 KeyWithPosition(

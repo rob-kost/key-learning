@@ -16,7 +16,7 @@ import java.util.UUID
 class BlockDao : BaseDao<BlockDto, UUID> {
     override fun findById(id: UUID): BlockDto? =
         transaction {
-            Blocks.select(Blocks.id eq id)
+            Blocks.selectAll().where { Blocks.id eq id }
                 .map { rowToBlock(it) }
                 .singleOrNull()
         }
@@ -59,7 +59,7 @@ class BlockDao : BaseDao<BlockDto, UUID> {
 
     fun findByName(name: String): BlockDto? =
         transaction {
-            Blocks.select(Blocks.name eq name)
+            Blocks.selectAll().where { Blocks.name eq name }
                 .map { rowToBlock(it) }
                 .singleOrNull()
         }

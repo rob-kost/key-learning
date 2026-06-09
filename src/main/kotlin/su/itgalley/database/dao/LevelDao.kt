@@ -17,7 +17,8 @@ import java.util.UUID
 class LevelDao : BaseDao<LevelDto, UUID> {
     override fun findById(id: UUID): LevelDto? =
         transaction {
-            Levels.select(Levels.id eq id)
+            Levels.selectAll()
+                .where { Levels.id eq id }
                 .map { rowToLevel(it) }
                 .singleOrNull()
         }
@@ -59,7 +60,8 @@ class LevelDao : BaseDao<LevelDto, UUID> {
     // Получить уровни блока, отсортированные по позиции
     fun findByBlockOrdered(blockId: UUID): List<LevelDto> =
         transaction {
-            Levels.select(Levels.blockId eq blockId)
+            Levels.selectAll()
+                .where { Levels.blockId eq blockId }
                 .orderBy(Levels.position to SortOrder.ASC)
                 .map { rowToLevel(it) }
         }
@@ -79,7 +81,7 @@ class LevelDao : BaseDao<LevelDto, UUID> {
     fun getLevelTaskDescription(levelId: UUID): String? =
         transaction {
             (Levels innerJoin Tasks)
-                .select(Levels.id eq levelId)
+                .selectAll().where { Levels.id eq levelId }
                 .map { it[Tasks.description] }
                 .singleOrNull()
         }
