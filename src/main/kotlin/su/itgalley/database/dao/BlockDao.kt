@@ -5,7 +5,6 @@ import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
@@ -30,7 +29,7 @@ class BlockDao : BaseDao<BlockDto, UUID> {
     fun findAllSorted(): List<BlockDto> =
         transaction {
             Blocks.selectAll()
-                .orderBy(Blocks.name to SortOrder.ASC)   // добавляем сортировку
+                .orderBy(Blocks.name to SortOrder.ASC) // добавляем сортировку
                 .map { rowToBlock(it) }
         }
 

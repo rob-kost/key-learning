@@ -5,7 +5,6 @@ import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
@@ -92,15 +91,16 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
         )
 
     // Метод для получения всех подзадач уровня с сортировкой
-    fun getSubtasksByLevelWithPosition(levelId: UUID): List<Pair<SubTaskDto, Int>> = transaction {
-        (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
-            .selectAll().where { Levels.id eq levelId }
-            .orderBy(TaskSubtasks.position to SortOrder.ASC)
-            .map { row ->
-                Pair(
-                    rowToSubtask(row),
-                    row[TaskSubtasks.position],
-                )
-            }
-    }
+    fun getSubtasksByLevelWithPosition(levelId: UUID): List<Pair<SubTaskDto, Int>> =
+        transaction {
+            (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
+                .selectAll().where { Levels.id eq levelId }
+                .orderBy(TaskSubtasks.position to SortOrder.ASC)
+                .map { row ->
+                    Pair(
+                        rowToSubtask(row),
+                        row[TaskSubtasks.position],
+                    )
+                }
+        }
 }
