@@ -47,7 +47,7 @@ fun main() {
     val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao)
 
     // Запуск сервера
-    val port = 9000
+    val port = 8228
     val server = app.asServer(Jetty(port)).start()
     println("Server started on http://localhost:$port/")
 }
