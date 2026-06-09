@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Subtasks (
     ),
     -- Гарантирует, что для одного типа либо key_solution_id, либо string_solution будет NULL
     CONSTRAINT chk_subtask_clean_other_solution CHECK (
-        (solution_type = 'TYPING' AND key_solution_id IS NULL) AND
+        (solution_type = 'TYPING' AND key_solution_id IS NULL) OR
         (solution_type = 'HOTKEY' AND string_solution IS NULL)
     )
 ) ENGINE=InnoDB COMMENT 'Элементарные задания, из которых состоят задания';
