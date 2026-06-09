@@ -52,7 +52,7 @@ object KeysTable : Table("keys") {
     override val primaryKey = PrimaryKey(id)
 }
 
-object CombinationKeys : Table("combination_keys") {
+object CombinationKeys : Table("combinationkeys") {
     val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val combinationId = reference("combination_id", Combinations.id, onDelete = ReferenceOption.CASCADE)
     val keyId = reference("key_id", KeysTable.id, onDelete = ReferenceOption.RESTRICT)
@@ -80,7 +80,7 @@ object Tasks : Table("tasks") {
     override val primaryKey = PrimaryKey(id)
 }
 
-object LevelHelps : Table("level_helps") {
+object LevelHelps : Table("levelhelps") {
     val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val content = text("content")
 
@@ -126,7 +126,7 @@ object Subtasks : Table("subtasks") {
     }
 }
 
-object TaskSubtasks : Table("task_subtasks") {
+object TaskSubtasks : Table("tasksubtasks") {
     val id = javaUUID("id").clientDefault { UUID.randomUUID() }
     val taskId = reference("task_id", Tasks.id, onDelete = ReferenceOption.CASCADE)
     val subtaskId = reference("subtask_id", Subtasks.id, onDelete = ReferenceOption.CASCADE)
