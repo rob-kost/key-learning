@@ -9,7 +9,6 @@ import su.itgalley.database.schema.CombinationKeys
 import su.itgalley.database.schema.HotKeys
 import su.itgalley.database.schema.KeysTable
 import su.itgalley.dto.HotKeyDto
-import su.itgalley.dto.KeyWithPosition
 import java.util.*
 
 class HotKeyDao : BaseDao<HotKeyDto, UUID> {
@@ -53,16 +52,4 @@ class HotKeyDao : BaseDao<HotKeyDto, UUID> {
             description = row[HotKeys.description],
             keyCombinationId = row[HotKeys.keyCombinationId],
         )
-
-    fun getKeysForCombination(combinationId: UUID): List<KeyWithPosition> = transaction {
-        (CombinationKeys innerJoin KeysTable)
-            .select(CombinationKeys.combinationId eq combinationId)
-            .orderBy(CombinationKeys.position to SortOrder.ASC)
-            .map { row ->
-                KeyWithPosition(
-                    key = row[KeysTable.key],
-                    position = row[CombinationKeys.position],
-                )
-            }
-    }
 }

@@ -1,6 +1,7 @@
 package su.itgalley.database.dao
 
 import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -23,6 +24,13 @@ class BlockDao : BaseDao<BlockDto, UUID> {
     override fun findAll(): List<BlockDto> =
         transaction {
             Blocks.selectAll()
+                .map { rowToBlock(it) }
+        }
+
+    fun findAllSorted(): List<BlockDto> =
+        transaction {
+            Blocks.selectAll()
+                .orderBy(Blocks.name to SortOrder.ASC)   // добавляем сортировку
                 .map { rowToBlock(it) }
         }
 

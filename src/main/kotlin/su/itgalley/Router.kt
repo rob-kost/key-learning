@@ -9,8 +9,8 @@ import su.itgalley.database.dao.BlockDao
 import su.itgalley.database.dao.HotKeyDao
 import su.itgalley.database.dao.LevelDao
 import su.itgalley.database.dao.SubtaskDao
-import su.itgalley.handlers.getBlocksWithLevelsHandler
-import su.itgalley.handlers.getSubtasksByLevelHandler
+import su.itgalley.handlers.getLevelSubtasksHandler
+import su.itgalley.handlers.getNavigationHandler
 
 fun createRouter(
     blockDao: BlockDao,
@@ -23,8 +23,8 @@ fun createRouter(
     val app: HttpHandler =
         routes(
             "/" bind staticHandler,
-            "/api/blocks" bind getBlocksWithLevelsHandler(blockDao, levelDao),
-            "/levels/{levelId}/subtasks" bind getSubtasksByLevelHandler(levelDao, subtaskDao, hotKeyDao),
+            "/api/navigation" bind getNavigationHandler(blockDao, levelDao),
+            "/api/levels/{levelId}" bind getLevelSubtasksHandler(levelDao, subtaskDao, hotKeyDao),
         )
 
     return app
