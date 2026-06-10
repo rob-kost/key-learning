@@ -17,7 +17,9 @@ import java.util.UUID
 class TaskSubtaskDao : BaseDao<TaskSubtaskDto, UUID> {
     override fun findById(id: UUID): TaskSubtaskDto? =
         transaction {
-            TaskSubtasks.selectAll().where { TaskSubtasks.id eq id }
+            TaskSubtasks
+                .selectAll()
+                .where { TaskSubtasks.id eq id }
                 .map { rowToTaskSubtask(it) }
                 .singleOrNull()
         }
@@ -52,7 +54,8 @@ class TaskSubtaskDao : BaseDao<TaskSubtaskDto, UUID> {
     fun getSubtasksForTask(taskId: UUID): List<SubTaskDto> =
         transaction {
             (TaskSubtasks innerJoin Subtasks)
-                .selectAll().where { TaskSubtasks.taskId eq taskId }
+                .selectAll()
+                .where { TaskSubtasks.taskId eq taskId }
                 .orderBy(TaskSubtasks.position to SortOrder.ASC)
                 .map { row -> SubtaskDao().rowToSubtask(row) }
         }

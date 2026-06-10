@@ -14,7 +14,9 @@ import java.util.UUID
 class KeyDao : BaseDao<KeysTableDto, UUID> {
     override fun findById(id: UUID): KeysTableDto? =
         transaction {
-            KeysTable.selectAll().where { KeysTable.id eq id }
+            KeysTable
+                .selectAll()
+                .where { KeysTable.id eq id }
                 .map { rowToKey(it) }
                 .singleOrNull()
         }
@@ -49,7 +51,9 @@ class KeyDao : BaseDao<KeysTableDto, UUID> {
     // Поиск клавиши по названию
     fun findByKeyName(keyName: String): KeysTableDto? =
         transaction {
-            KeysTable.selectAll().where { KeysTable.key eq keyName }
+            KeysTable
+                .selectAll()
+                .where { KeysTable.key eq keyName }
                 .map { rowToKey(it) }
                 .singleOrNull()
         }

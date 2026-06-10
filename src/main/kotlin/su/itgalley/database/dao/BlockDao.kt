@@ -15,20 +15,24 @@ import java.util.UUID
 class BlockDao : BaseDao<BlockDto, UUID> {
     override fun findById(id: UUID): BlockDto? =
         transaction {
-            Blocks.selectAll().where { Blocks.id eq id }
+            Blocks
+                .selectAll()
+                .where { Blocks.id eq id }
                 .map { rowToBlock(it) }
                 .singleOrNull()
         }
 
     override fun findAll(): List<BlockDto> =
         transaction {
-            Blocks.selectAll()
+            Blocks
+                .selectAll()
                 .map { rowToBlock(it) }
         }
 
     fun findAllSorted(): List<BlockDto> =
         transaction {
-            Blocks.selectAll()
+            Blocks
+                .selectAll()
                 .orderBy(Blocks.name to SortOrder.ASC) // добавляем сортировку
                 .map { rowToBlock(it) }
         }
@@ -58,7 +62,9 @@ class BlockDao : BaseDao<BlockDto, UUID> {
 
     fun findByName(name: String): BlockDto? =
         transaction {
-            Blocks.selectAll().where { Blocks.name eq name }
+            Blocks
+                .selectAll()
+                .where { Blocks.name eq name }
                 .map { rowToBlock(it) }
                 .singleOrNull()
         }

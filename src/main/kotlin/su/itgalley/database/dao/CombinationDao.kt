@@ -13,7 +13,9 @@ import java.util.UUID
 class CombinationDao : BaseDao<CombinationDto, UUID> {
     override fun findById(id: UUID): CombinationDto? =
         transaction {
-            Combinations.selectAll().where { Combinations.id eq id }
+            Combinations
+                .selectAll()
+                .where { Combinations.id eq id }
                 .map { rowToCombination(it) }
                 .singleOrNull()
         }

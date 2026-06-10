@@ -14,7 +14,9 @@ import java.util.UUID
 class LevelHelpDao : BaseDao<LevelHelpDto, UUID> {
     override fun findById(id: UUID): LevelHelpDto? =
         transaction {
-            LevelHelps.selectAll().where { LevelHelps.id eq id }
+            LevelHelps
+                .selectAll()
+                .where { LevelHelps.id eq id }
                 .map { rowToLevelHelp(it) }
                 .singleOrNull()
         }

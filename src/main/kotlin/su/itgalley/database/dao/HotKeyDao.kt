@@ -12,13 +12,15 @@ import su.itgalley.database.schema.CombinationKeys
 import su.itgalley.database.schema.HotKeys
 import su.itgalley.database.schema.KeysTable
 import su.itgalley.dto.HotKeyDto
-import su.itgalley.dto.KeyWithPosition
+import su.itgalley.dto.KeyWithPositionDto
 import java.util.UUID
 
 class HotKeyDao : BaseDao<HotKeyDto, UUID> {
     override fun findById(id: UUID): HotKeyDto? =
         transaction {
-            HotKeys.selectAll().where { HotKeys.id eq id }
+            HotKeys
+                .selectAll()
+                .where { HotKeys.id eq id }
                 .map { rowToHotKey(it) }
                 .singleOrNull()
         }
@@ -57,13 +59,14 @@ class HotKeyDao : BaseDao<HotKeyDto, UUID> {
             keyCombinationId = row[HotKeys.keyCombinationId],
         )
 
-    fun getKeysForCombination(combinationId: UUID): List<KeyWithPosition> =
+    fun getKeysForCombination(combinationId: UUID): List<KeyWithPositionDto> =
         transaction {
             (CombinationKeys innerJoin KeysTable)
-                .selectAll().where { CombinationKeys.combinationId eq combinationId }
+                .selectAll()
+                .where { CombinationKeys.combinationId eq combinationId }
                 .orderBy(CombinationKeys.position to SortOrder.ASC)
                 .map { row ->
-                    KeyWithPosition(
+                    KeyWithPositionDto(
                         key = row[KeysTable.key],
                         position = row[CombinationKeys.position],
                     )

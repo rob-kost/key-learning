@@ -14,7 +14,9 @@ import java.util.UUID
 class TaskDao : BaseDao<TaskDto, UUID> {
     override fun findById(id: UUID): TaskDto? =
         transaction {
-            Tasks.selectAll().where { Tasks.id eq id }
+            Tasks
+                .selectAll()
+                .where { Tasks.id eq id }
                 .map { rowToTask(it) }
                 .singleOrNull()
         }

@@ -16,7 +16,9 @@ import java.util.UUID
 class CombinationKeyDao : BaseDao<CombinationKeyDto, UUID> {
     override fun findById(id: UUID): CombinationKeyDto? =
         transaction {
-            CombinationKeys.selectAll().where { CombinationKeys.id eq id }
+            CombinationKeys
+                .selectAll()
+                .where { CombinationKeys.id eq id }
                 .map { rowToCombinationKey(it) }
                 .singleOrNull()
         }
@@ -53,7 +55,9 @@ class CombinationKeyDao : BaseDao<CombinationKeyDto, UUID> {
     // Получить все клавиши комбинации, отсортированные по позиции
     fun getKeysForCombination(combinationId: UUID): List<CombinationKeyDto> =
         transaction {
-            CombinationKeys.selectAll().where { CombinationKeys.combinationId eq combinationId }
+            CombinationKeys
+                .selectAll()
+                .where { CombinationKeys.combinationId eq combinationId }
                 .orderBy(CombinationKeys.position to SortOrder.ASC)
                 .map { rowToCombinationKey(it) }
         }
@@ -68,7 +72,8 @@ class CombinationKeyDao : BaseDao<CombinationKeyDto, UUID> {
     fun getCombinationIdsByKey(keyValue: String): List<UUID> =
         transaction {
             (CombinationKeys innerJoin KeysTable)
-                .selectAll().where { KeysTable.key eq keyValue }
+                .selectAll()
+                .where { KeysTable.key eq keyValue }
                 .map { it[CombinationKeys.combinationId] }
                 .distinct()
         }

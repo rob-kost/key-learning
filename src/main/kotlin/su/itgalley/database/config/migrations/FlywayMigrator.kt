@@ -55,7 +55,8 @@ private fun loadConfig(): Pair<DbConfig, String> {
 }
 
 private fun createFlyway(config: DbConfig): Flyway =
-    Flyway.configure()
+    Flyway
+        .configure()
         .dataSource(config.url, config.username, config.password)
         .locations("classpath:db/migrations")
         .baselineOnMigrate(true)
@@ -93,17 +94,20 @@ private fun executeCommand(
                 // выводит количество применённых миграций
                 println("Successfully applied ${result.migrationsExecuted} migrations")
             }
+
             "info" -> {
                 val info = flyway.info()
                 // выводит текущую миграцию в бд и количество миграций, которые ожидают применения
                 println("Current version: ${info.current()?.version ?: "Empty"}")
                 println("Pending: ${info.pending().size}")
             }
+
             "repair" -> {
                 // выполняет синхронизацию
                 flyway.repair()
                 println("Schema history repaired (checksums aligned)")
             }
+
             "clean" -> {
                 // полностью очищает базу данных
                 print("DESTROY ALL DATA? Type 'YES' to confirm: ")
@@ -114,7 +118,10 @@ private fun executeCommand(
                     println("Canceled")
                 }
             }
-            else -> printError()
+
+            else -> {
+                printError()
+            }
         }
     } catch (e: FlywayException) {
         println("FATAL (Flyway): ${e.message}")

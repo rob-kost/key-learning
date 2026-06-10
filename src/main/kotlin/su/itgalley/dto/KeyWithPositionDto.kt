@@ -1,6 +1,6 @@
 package su.itgalley.dto
 
-data class KeyWithPosition(
+data class KeyWithPositionDto(
     val key: String,
     val position: Int,
 )
