@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm") version "2.3.20"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    kotlin("plugin.serialization") version "2.3.20"
 }
 
 application {
@@ -26,6 +27,7 @@ val detectVersion = "1.23.8"
 val ktlintVersion = "12.1.0"
 val logbackVersion = "1.5.16"
 val mariaDBVersion = "3.5.8"
+val serializationJsonVersion = "1.11.0"
 
 dependencies {
 
@@ -57,6 +59,9 @@ dependencies {
     // Flyway (миграции БД)
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
+
+    // Serialization-json
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationJsonVersion")
 
     // Тестирование
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
