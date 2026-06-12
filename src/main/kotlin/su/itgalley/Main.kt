@@ -5,9 +5,18 @@ import org.http4k.server.asServer
 import su.itgalley.database.config.DatabaseConfig
 import su.itgalley.database.config.DbConfig
 import su.itgalley.database.dao.BlockDao
+import su.itgalley.database.dao.CombinationDao
+import su.itgalley.database.dao.CombinationKeyDao
+import su.itgalley.database.dao.DaoRegistry
 import su.itgalley.database.dao.HotKeyDao
+import su.itgalley.database.dao.KeyDao
 import su.itgalley.database.dao.LevelDao
+import su.itgalley.database.dao.LevelHelpDao
 import su.itgalley.database.dao.SubtaskDao
+import su.itgalley.database.dao.TaskDao
+import su.itgalley.database.dao.TaskSubtaskDao
+import su.itgalley.database.dao.TutorialDao
+import su.itgalley.database.seed.DatabaseSeeder
 import java.io.File
 import java.util.Properties
 
@@ -42,6 +51,33 @@ fun main() {
     val levelDao = LevelDao()
     val subtaskDao = SubtaskDao()
     val hotKeyDao = HotKeyDao()
+    val keyDao = KeyDao()
+    val tutorialDao = TutorialDao()
+    val levelHelpDao = LevelHelpDao()
+    val taskDao = TaskDao()
+    val combinationDao = CombinationDao()
+    val combinationKeyDao = CombinationKeyDao()
+    val taskSubtaskDao = TaskSubtaskDao()
+
+    // Регистрация всех DAO
+    val daoRegistry =
+        DaoRegistry(
+            keyDao = keyDao,
+            blockDao = blockDao,
+            tutorialDao = tutorialDao,
+            levelHelpDao = levelHelpDao,
+            taskDao = taskDao,
+            combinationDao = combinationDao,
+            combinationKeyDao = combinationKeyDao,
+            hotKeyDao = hotKeyDao,
+            subtaskDao = subtaskDao,
+            taskSubtaskDao = taskSubtaskDao,
+            levelDao = levelDao,
+        )
+
+    // Заполнение базы данными
+    val seeder = DatabaseSeeder(daoRegistry)
+    seeder.seed()
 
     // Создание роутера
     val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao)
