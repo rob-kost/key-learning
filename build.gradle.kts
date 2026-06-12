@@ -60,7 +60,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
-    // Serialization-json
+    // Serialization-json для наполнения базы данных
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationJsonVersion")
 
     // Тестирование
