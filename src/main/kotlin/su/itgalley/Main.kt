@@ -1,5 +1,6 @@
 package su.itgalley
 
+import kotlinx.serialization.json.Json
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import su.itgalley.database.config.DatabaseConfig
@@ -17,11 +18,25 @@ import su.itgalley.database.dao.TaskDao
 import su.itgalley.database.dao.TaskSubtaskDao
 import su.itgalley.database.dao.TutorialDao
 import su.itgalley.database.seed.DatabaseSeeder
+import su.itgalley.database.seed.InputBlock
+import su.itgalley.database.seed.convertBlocksToSeedData
 import java.io.File
 import java.util.Properties
 
 fun main() {
-    // Загрузка конфигурации из app.properties
+    val config = loadDatabaseConfig()
+    DatabaseConfig.init(config, validateSchema = true)
+
+    val daoRegistry = createDaoRegistry()
+    convertAndGenerateSeedData()
+
+    val seeder = DatabaseSeeder(daoRegistry)
+    seeder.seed()
+
+    startServer(daoRegistry)
+}
+
+private fun loadDatabaseConfig(): DbConfig {
     val properties =
         Properties().apply {
             val propFile = File("app.properties")
@@ -35,18 +50,15 @@ fun main() {
     val dbUser = properties.getProperty("db.user") ?: error("Missing db.user in app.properties")
     val dbPassword = properties.getProperty("db.password") ?: error("Missing db.password in app.properties")
 
-    val dbConfig =
-        DbConfig(
-            url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
-            username = dbUser,
-            password = dbPassword,
-            poolSize = 10,
-        )
+    return DbConfig(
+        url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
+        username = dbUser,
+        password = dbPassword,
+        poolSize = 10,
+    )
+}
 
-    // Инициализация пула соединений HikariCP и подключение Exposed
-    DatabaseConfig.init(dbConfig, validateSchema = true)
-
-    // Создание экземпляров DAO для роутера
+private fun createDaoRegistry(): DaoRegistry {
     val blockDao = BlockDao()
     val levelDao = LevelDao()
     val subtaskDao = SubtaskDao()
@@ -59,30 +71,54 @@ fun main() {
     val combinationKeyDao = CombinationKeyDao()
     val taskSubtaskDao = TaskSubtaskDao()
 
-    // Регистрация всех DAO
-    val daoRegistry =
-        DaoRegistry(
-            keyDao = keyDao,
-            blockDao = blockDao,
-            tutorialDao = tutorialDao,
-            levelHelpDao = levelHelpDao,
-            taskDao = taskDao,
-            combinationDao = combinationDao,
-            combinationKeyDao = combinationKeyDao,
-            hotKeyDao = hotKeyDao,
-            subtaskDao = subtaskDao,
-            taskSubtaskDao = taskSubtaskDao,
-            levelDao = levelDao,
-        )
+    return DaoRegistry(
+        keyDao = keyDao,
+        blockDao = blockDao,
+        tutorialDao = tutorialDao,
+        levelHelpDao = levelHelpDao,
+        taskDao = taskDao,
+        combinationDao = combinationDao,
+        combinationKeyDao = combinationKeyDao,
+        hotKeyDao = hotKeyDao,
+        subtaskDao = subtaskDao,
+        taskSubtaskDao = taskSubtaskDao,
+        levelDao = levelDao,
+    )
+}
 
-    // Заполнение базы данными
-    val seeder = DatabaseSeeder(daoRegistry)
-    seeder.seed()
+private fun convertAndGenerateSeedData() {
+    val inputFile = File("src/main/resources/Keylearning_template.json")
+    val outputFile = File("src/main/resources/seed_data.json")
 
-    // Создание роутера
+    // Проверяем, нужно ли обновлять seed_data.json
+    if (outputFile.exists() && outputFile.lastModified() >= inputFile.lastModified()) {
+        println("seed_data.json is already up to date, conversion not required")
+        return
+    }
+
+    val json =
+        Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+        }
+
+    val jsonString = inputFile.readText()
+    val simpleJson = json.decodeFromString<List<InputBlock>>(jsonString)
+    val seedData = convertBlocksToSeedData(simpleJson)
+
+    outputFile.writeText(json.encodeToString(seedData))
+    println("Conversion completed. seed_data.json file created")
+}
+
+private fun startServer(daoRegistry: DaoRegistry) {
+    val blockDao = daoRegistry.blockDao
+    val levelDao = daoRegistry.levelDao
+    val subtaskDao = daoRegistry.subtaskDao
+    val hotKeyDao = daoRegistry.hotKeyDao
+    val tutorialDao = daoRegistry.tutorialDao
+    val levelHelpDao = daoRegistry.levelHelpDao
+
     val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao)
-
-    // Запуск сервера
     val port = 8228
     val server = app.asServer(Jetty(port)).start()
     println("Server started on http://localhost:$port/")
