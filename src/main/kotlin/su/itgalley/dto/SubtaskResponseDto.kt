@@ -8,4 +8,5 @@ data class SubtaskResponseDto(
     val solutionType: SolutionType,
     val description: String,
     val combination: List<Map<String, String>>,
+    val expectedText: String?,
 )

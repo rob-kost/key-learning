@@ -80,7 +80,7 @@ fun main() {
     seeder.seed()
 
     // Создание роутера
-    val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao)
+    val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao)
 
     // Запуск сервера
     val port = 8228
