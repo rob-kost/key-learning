@@ -63,7 +63,7 @@ class DatabaseSeeder(
             insertLevels(seedData.levels, refs)
         }
 
-        println("Seeding completed successfully.")
+        println("Seeding completed successfully")
     }
 
     private fun loadSeedData(): SeedData {
