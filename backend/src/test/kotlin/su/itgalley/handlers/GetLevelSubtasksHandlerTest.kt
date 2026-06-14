@@ -189,6 +189,7 @@ class GetLevelSubtasksHandlerTest {
 
         @Suppress("UNCHECKED_CAST")
         val subtasks = mapper.readValue<Map<String, Any?>>(response.bodyString())["subtasks"] as List<Map<String, Any?>>
+
         @Suppress("UNCHECKED_CAST")
         val combination = subtasks.single()["combination"] as List<Map<String, String>>
         combination shouldHaveSize 0
@@ -234,6 +235,7 @@ class GetLevelSubtasksHandlerTest {
 
         @Suppress("UNCHECKED_CAST")
         val subtasks = mapper.readValue<Map<String, Any?>>(response.bodyString())["subtasks"] as List<Map<String, Any?>>
+
         @Suppress("UNCHECKED_CAST")
         val combination = subtasks.single()["combination"] as List<Map<String, String>>
         combination shouldHaveSize 0

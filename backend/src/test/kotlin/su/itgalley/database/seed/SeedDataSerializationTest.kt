@@ -90,6 +90,12 @@ class SeedDataSerializationTest {
 
         val blocks = json.decodeFromString<List<InputBlock>>(payload)
 
-        blocks.single().levels.single().subtasks.single().type shouldBe "TYPING"
+        blocks
+            .single()
+            .levels
+            .single()
+            .subtasks
+            .single()
+            .type shouldBe "TYPING"
     }
 }
