@@ -67,7 +67,7 @@ fun getLevelSubtasksHandler(
                             solutionType = subtask.solutionType,
                             description = subtask.description,
                             combination = combination,
-                            expectedText = if (subtask.solutionType == SolutionType.TYPING) subtask.stringSolution else null,
+                            stringSolution = if (subtask.solutionType == SolutionType.TYPING) subtask.stringSolution else null,
                         )
                     }
 

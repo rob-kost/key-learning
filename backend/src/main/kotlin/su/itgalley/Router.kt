@@ -1,6 +1,7 @@
 package su.itgalley
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -23,12 +24,26 @@ fun createRouter(
     tutorialDao: TutorialDao,
     levelHelpDao: LevelHelpDao,
 ): HttpHandler {
-    val app: HttpHandler =
+    val apiRoutes =
         routes(
             "/" bind { _: Request -> Response(Status.OK).body("api is running") },
             "/api/navigation" bind getNavigationHandler(blockDao, levelDao),
             "/api/levels/{levelId}" bind getLevelSubtasksHandler(levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao),
         )
 
-    return app
+    // CORS-обёртка
+    return object : HttpHandler {
+        override fun invoke(request: Request): Response {
+            // Обработка предварительного запроса OPTIONS
+            if (request.method == Method.OPTIONS) {
+                return Response(Status.OK)
+                    .header("Access-Control-Allow-Origin", "http://localhost:3000")
+                    .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+                    .header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+            }
+            // Обычный запрос – добавляем заголовок к ответу
+            val response = apiRoutes(request)
+            return response.header("Access-Control-Allow-Origin", "http://localhost:3000")
+        }
+    }
 }
