@@ -37,7 +37,11 @@ object TestDatabase {
         if (initialized) return
 
         Database.connect(
-            url = "jdbc:h2:mem:keylearning_test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1",
+            url = "jdbc:h2:mem:keylearning_test;" +
+                    "MODE=MySQL;" +
+                    "DATABASE_TO_LOWER=TRUE;" +
+                    "CASE_INSENSITIVE_IDENTIFIERS=TRUE;" +
+                    "DB_CLOSE_DELAY=-1",
             driver = "org.h2.Driver",
             user = "sa",
             password = "",
