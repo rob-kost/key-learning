@@ -19,7 +19,7 @@ out/
 .idea/dataSources.xml
 .idea/dataSources/
 .idea/detekt.xml
-
+.idea
 ### Kotlin ###
 .kotlin
 
