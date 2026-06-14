@@ -120,7 +120,7 @@ object Subtasks : Table("subtasks") {
                 (solutionType eq SolutionType.HOTKEY and keySolutionId.isNotNull())
         }
         check("chk_subtask_clean_other_solution") {
-            (solutionType eq SolutionType.TYPING and keySolutionId.isNull()) and
+            (solutionType eq SolutionType.TYPING and keySolutionId.isNull()) or
                 (solutionType eq SolutionType.HOTKEY and stringSolution.isNull())
         }
     }

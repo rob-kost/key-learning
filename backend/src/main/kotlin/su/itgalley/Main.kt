@@ -107,6 +107,12 @@ private fun convertAndGenerateSeedData() {
     val seedData = convertBlocksToSeedData(simpleJson)
 
     outputFile.writeText(json.encodeToString(seedData))
+
+    // Копируем в build, чтобы classloader нашёл
+    val buildFile = File("build/resources/main/seed_data.json")
+    buildFile.parentFile.mkdirs()
+    buildFile.writeText(json.encodeToString(seedData))
+
     println("Conversion completed. seed_data.json file created")
 }
 
