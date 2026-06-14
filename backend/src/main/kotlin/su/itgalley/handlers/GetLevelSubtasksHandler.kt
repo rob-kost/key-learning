@@ -15,6 +15,7 @@ import su.itgalley.database.schema.SolutionType
 import su.itgalley.dto.SubtaskResponseDto
 import java.util.UUID
 
+@Suppress("LongMethod")
 fun getLevelSubtasksHandler(
     levelDao: LevelDao,
     subtaskDao: SubtaskDao,
@@ -67,7 +68,12 @@ fun getLevelSubtasksHandler(
                             solutionType = subtask.solutionType,
                             description = subtask.description,
                             combination = combination,
-                            stringSolution = if (subtask.solutionType == SolutionType.TYPING) subtask.stringSolution else null,
+                            stringSolution =
+                                if (subtask.solutionType == SolutionType.TYPING) {
+                                    subtask.stringSolution
+                                } else {
+                                    null
+                                },
                         )
                     }
 

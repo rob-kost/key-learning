@@ -118,8 +118,17 @@ private fun startServer(daoRegistry: DaoRegistry) {
     val tutorialDao = daoRegistry.tutorialDao
     val levelHelpDao = daoRegistry.levelHelpDao
 
-    val app = createRouter(blockDao, levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao)
+    val app =
+        createRouter(
+            blockDao,
+            levelDao,
+            subtaskDao,
+            hotKeyDao,
+            tutorialDao,
+            levelHelpDao,
+        )
     val port = 8228
     val server = app.asServer(Jetty(port)).start()
     println("Server started on http://localhost:$port/")
+    server.block()
 }
