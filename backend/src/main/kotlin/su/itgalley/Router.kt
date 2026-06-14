@@ -16,6 +16,7 @@ import su.itgalley.database.dao.TutorialDao
 import su.itgalley.handlers.getLevelSubtasksHandler
 import su.itgalley.handlers.getNavigationHandler
 
+@Suppress("LongParameterList")
 fun createRouter(
     blockDao: BlockDao,
     levelDao: LevelDao,
@@ -28,7 +29,14 @@ fun createRouter(
         routes(
             "/" bind { _: Request -> Response(Status.OK).body("api is running :P") },
             "/api/navigation" bind getNavigationHandler(blockDao, levelDao),
-            "/api/levels/{levelId}" bind getLevelSubtasksHandler(levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao),
+            "/api/levels/{levelId}" bind
+                getLevelSubtasksHandler(
+                    levelDao,
+                    subtaskDao,
+                    hotKeyDao,
+                    tutorialDao,
+                    levelHelpDao,
+                ),
         )
 
     // CORS-обёртка

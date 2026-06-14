@@ -15,7 +15,7 @@ style:
       - 'kotlin.io.path'
   MagicNumber:
     active: true
-    ignoreNumbers: ['-1', '0', '1', '2', '9000']
+    ignoreNumbers: ['-1', '0', '1', '2', '8228']
     ignorePropertyDeclaration: true
     ignoreLocalVariableDeclaration: false
     ignoreConstantDeclaration: true
