@@ -13,7 +13,6 @@ import org.http4k.core.Status
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
-import su.itgalley.createRouter
 import su.itgalley.database.dao.HotKeyDao
 import su.itgalley.database.dao.LevelDao
 import su.itgalley.database.dao.LevelHelpDao
