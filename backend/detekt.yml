@@ -19,3 +19,7 @@ style:
     ignorePropertyDeclaration: true
     ignoreLocalVariableDeclaration: false
     ignoreConstantDeclaration: true
+complexity:
+  LongMethod:
+    active: true
+    threshold: 80 
