@@ -4,6 +4,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     kotlin("plugin.serialization") version "2.3.20"
+    jacoco
 }
 
 application {
@@ -70,10 +71,29 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.http4k:http4k-testing-approval:$http4kVersion")
     testImplementation("org.http4k:http4k-testing-hamkrest:$http4kVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.1.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.1.0")
+}
+
+jacoco {
+    toolVersion = "0.8.15"
 }
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
 }
 
 kotlin {
