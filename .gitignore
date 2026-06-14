@@ -50,3 +50,5 @@ bin/
 
 ### files .properties ###
 *.properties
+
+seed_data.json

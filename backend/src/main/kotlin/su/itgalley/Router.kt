@@ -26,7 +26,7 @@ fun createRouter(
 ): HttpHandler {
     val apiRoutes =
         routes(
-            "/" bind { _: Request -> Response(Status.OK).body("api is running") },
+            "/" bind { _: Request -> Response(Status.OK).body("api is running :P") },
             "/api/navigation" bind getNavigationHandler(blockDao, levelDao),
             "/api/levels/{levelId}" bind getLevelSubtasksHandler(levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao),
         )
