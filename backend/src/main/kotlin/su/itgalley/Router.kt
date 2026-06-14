@@ -30,13 +30,13 @@ fun createRouter(
             "/" bind { _: Request -> Response(Status.OK).body("api is running :P") },
             "/api/navigation" bind getNavigationHandler(blockDao, levelDao),
             "/api/levels/{levelId}" bind
-                    getLevelSubtasksHandler(
-                        levelDao,
-                        subtaskDao,
-                        hotKeyDao,
-                        tutorialDao,
-                        levelHelpDao,
-                    ),
+                getLevelSubtasksHandler(
+                    levelDao,
+                    subtaskDao,
+                    hotKeyDao,
+                    tutorialDao,
+                    levelHelpDao,
+                ),
         )
 
     // CORS-обёртка
