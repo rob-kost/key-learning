@@ -50,3 +50,4 @@ bin/
 
 ### files .properties ###
 *.properties
+!gradle/wrapper/gradle-wrapper.properties
