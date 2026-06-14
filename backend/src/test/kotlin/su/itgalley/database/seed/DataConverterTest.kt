@@ -199,6 +199,33 @@ class DataConverterTest {
     }
 
     @Test
+    fun `convertBlocksToSeedData classifies function keys as controls`() {
+        val blocks =
+            listOf(
+                InputBlock(
+                    name = "Fn Keys",
+                    description = "Block",
+                    levels =
+                        listOf(
+                            InputLevel(
+                                name = "F1",
+                                tutorial = null,
+                                help = null,
+                                subtasks =
+                                    listOf(
+                                        InputSubtask(type = "HOTKEY", desc = "Help", solution = "F1"),
+                                    ),
+                            ),
+                        ),
+                ),
+            )
+
+        val seedData = convertBlocksToSeedData(blocks)
+
+        seedData.keys.single().keyGroup shouldBe KeyGroup.CONTROLS
+    }
+
+    @Test
     fun `convertBlocksToSeedData throws on unknown subtask type`() {
         val blocks =
             listOf(

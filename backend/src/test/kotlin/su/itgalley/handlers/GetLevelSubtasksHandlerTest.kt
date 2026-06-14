@@ -138,6 +138,108 @@ class GetLevelSubtasksHandlerTest {
     }
 
     @Test
+    fun `returns bad request when level id path is missing`() {
+        val handlerWithoutTemplate =
+            routes(
+                "/api/levels" bind
+                    getLevelSubtasksHandler(levelDao, subtaskDao, hotKeyDao, tutorialDao, levelHelpDao),
+            )
+
+        val response = handlerWithoutTemplate(Request(Method.GET, "/api/levels"))
+
+        response.status shouldBe Status.BAD_REQUEST
+        response.bodyString() shouldBe "Missing level ID"
+    }
+
+    @Test
+    fun `returns empty combination when hotkey solution has no linked hotkey`() {
+        val levelId = UUID.randomUUID()
+        val blockId = UUID.randomUUID()
+        val taskId = UUID.randomUUID()
+        val subtaskId = UUID.randomUUID()
+
+        every { levelDao.findById(levelId) } returns
+            LevelDto(
+                id = levelId,
+                name = "Broken hotkey",
+                blockId = blockId,
+                position = 1,
+                tutorialId = null,
+                taskId = taskId,
+                levelHelpId = null,
+                requiredInBlock = RequiredInBlock.NO,
+            )
+        every { subtaskDao.getSubtasksByLevelWithPosition(levelId) } returns
+            listOf(
+                Pair(
+                    SubTaskDto(
+                        id = subtaskId,
+                        description = "Missing hotkey",
+                        solutionType = SolutionType.HOTKEY,
+                        stringSolution = null,
+                        keySolutionId = null,
+                    ),
+                    1,
+                ),
+            )
+
+        val response = handler(Request(Method.GET, "/api/levels/$levelId"))
+
+        response.status shouldBe Status.OK
+
+        @Suppress("UNCHECKED_CAST")
+        val subtasks = mapper.readValue<Map<String, Any?>>(response.bodyString())["subtasks"] as List<Map<String, Any?>>
+        @Suppress("UNCHECKED_CAST")
+        val combination = subtasks.single()["combination"] as List<Map<String, String>>
+        combination shouldHaveSize 0
+    }
+
+    @Test
+    fun `returns empty combination when hotkey record is not found`() {
+        val levelId = UUID.randomUUID()
+        val blockId = UUID.randomUUID()
+        val taskId = UUID.randomUUID()
+        val subtaskId = UUID.randomUUID()
+        val missingHotKeyId = UUID.randomUUID()
+
+        every { levelDao.findById(levelId) } returns
+            LevelDto(
+                id = levelId,
+                name = "Missing record",
+                blockId = blockId,
+                position = 1,
+                tutorialId = null,
+                taskId = taskId,
+                levelHelpId = null,
+                requiredInBlock = RequiredInBlock.NO,
+            )
+        every { subtaskDao.getSubtasksByLevelWithPosition(levelId) } returns
+            listOf(
+                Pair(
+                    SubTaskDto(
+                        id = subtaskId,
+                        description = "Stale hotkey id",
+                        solutionType = SolutionType.HOTKEY,
+                        stringSolution = null,
+                        keySolutionId = missingHotKeyId,
+                    ),
+                    1,
+                ),
+            )
+        every { hotKeyDao.findById(missingHotKeyId) } returns null
+
+        val response = handler(Request(Method.GET, "/api/levels/$levelId"))
+
+        response.status shouldBe Status.OK
+
+        @Suppress("UNCHECKED_CAST")
+        val subtasks = mapper.readValue<Map<String, Any?>>(response.bodyString())["subtasks"] as List<Map<String, Any?>>
+        @Suppress("UNCHECKED_CAST")
+        val combination = subtasks.single()["combination"] as List<Map<String, String>>
+        combination shouldHaveSize 0
+    }
+
+    @Test
     fun `returns typing subtask without combination keys`() {
         val levelId = UUID.randomUUID()
         val blockId = UUID.randomUUID()
