@@ -87,7 +87,7 @@ private fun createDaoRegistry(): DaoRegistry {
 }
 
 private fun convertAndGenerateSeedData() {
-    val inputFile = File("src/main/resources/KeyLearningBlock1.json")
+    val inputFile = File("src/main/resources/KeyLearning_content.json")
     val outputFile = File("src/main/resources/seed_data.json")
 
     // Проверяем, нужно ли обновлять seed_data.json
