@@ -18,6 +18,7 @@
 
 const restartBtn = document.getElementById('restartLevel');
 let currentLevelId = null; // глобальная переменная для текущего уровня
+let currentLevelName = '';
 
     let activeTutorialContent = null;
     let tasksQueue = [];
@@ -59,6 +60,30 @@ restartBtn.addEventListener('click', () => {
     // Сохраняем команду перезапуска этого уровня
     sessionStorage.setItem('restartLevel', currentLevelId);
     location.reload();
+});
+
+const skipBtn = document.getElementById('skipLevelBtn');
+    skipBtn.style.display = 'flex';
+
+skipBtn.addEventListener('click', () => {
+    if (!currentLevelId) return;
+    if (!completedLevels.includes(currentLevelId)) {
+        completedLevels.push(currentLevelId);
+        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+    }
+    clearProgress();
+    // Переход к следующему уровню (как в конце startLevelSequence)
+    const block = blocksData.find(b => b.levels.some(l => l.id === currentLevelId));
+    if (block) {
+        const currentLevelIndex = block.levels.findIndex(l => l.id === currentLevelId);
+        const nextLevel = block.levels[currentLevelIndex + 1];
+        if (nextLevel) {
+            hideStaticPage();
+            startLevelSequence(nextLevel.id);
+        } else {
+            advanceToNextBlock();
+        }
+    }
 });
 
 window.renderHomePage=function() {
@@ -565,6 +590,7 @@ window.advanceToNextBlock=function() {
 	hideStaticPage();
 	currentLevelId = levelId;
 restartBtn.style.display = 'flex'; // показать кнопку
+skipBtn.style.display = 'flex';
     const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
     if (block) currentBlockIndex = blocksData.indexOf(block);
 
@@ -612,6 +638,7 @@ activeHelpContent = levelData.help || null;
     localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
 }
         const levelName = getLevelName(levelId);
+	currentLevelName = levelName;
         display.textContent = `Уровень "${levelName}" пройден!`;
         adjustFontSize(display);
         display.style.color = '#4caf50';
@@ -647,22 +674,23 @@ activeHelpContent = levelData.help || null;
 
     // ========== ЗАПУСК ОДНОГО УРОВНЯ ==========
 window.startLevel=function(taskData) {
+	const prefix = currentLevelName ? `[${currentLevelName}] ` : '';
     if (taskData.solutionType === 'HOTKEY') {
         if (taskData.description && taskData.description.trim() !== '') {
             taskTextEl.textContent = taskData.description;
         } else {
             const keys = taskData.combination.map(k => displayKey(k.key)).join(' + ');
-            taskTextEl.textContent = 'Введите сочетание клавиш: ' + keys;
+            taskTextEl.textContent = prefix + 'Введите сочетание клавиш: ' + keys;
         }
     } else if (taskData.solutionType === 'TYPING') {
         if (taskData.description && taskData.description.trim() !== '') {
-            taskTextEl.textContent = taskData.description;
+            taskTextEl.textContent = prefix + taskData.description;
         } else {
             const target = taskData.stringSolution || taskData.description || '';
-            taskTextEl.textContent = 'Введите текст: ' + target;
+            taskTextEl.textContent = prefix + 'Введите текст: ' + target;
         }
     } else {
-        taskTextEl.textContent = taskData.description || '';
+        taskTextEl.textContent = prefix + (taskData.description || '');
     }
 
     return new Promise((resolve) => {
@@ -710,7 +738,8 @@ window.startHKLevel=function(taskData) {
             display.style.color = '';
 
             const steps = [...taskData.combination];
-	const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key));
+	const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key)) ||
+    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'W'));
 	if (sequentialMode) {
     taskTextEl.textContent += ' (вводите клавиши по одной)';
 }
