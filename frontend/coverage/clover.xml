@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1781529836448" clover="3.2.0">
-  <project timestamp="1781529836448" name="All files">
+<coverage generated="1781532390479" clover="3.2.0">
+  <project timestamp="1781532390479" name="All files">
     <metrics statements="602" coveredstatements="360" conditionals="397" coveredconditionals="209" methods="83" coveredmethods="54" elements="1082" coveredelements="623" complexity="0" loc="602" ncloc="602" packages="1" files="1" classes="1"/>
     <file name="script.js" path="C:\Users\артем\Desktop\Универ\Проект по программной инженерии\frontend\script.js">
       <metrics statements="602" coveredstatements="360" conditionals="397" coveredconditionals="209" methods="83" coveredmethods="54"/>

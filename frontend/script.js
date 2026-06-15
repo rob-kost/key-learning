@@ -374,7 +374,8 @@ window.showBlockPage=function(block) {
     if (main) main.classList.add('static-mode');
     const sp = document.getElementById('staticPage');
     if (!sp) return;
-    const firstAvailable = isLevelAvailable(window.blocksData, window.blocksData.indexOf(block), 0, block);
+    const blockIndex = window.blocksData ? window.blocksData.indexOf(block) : -1;
+const firstAvailable = blockIndex >= 0 ? isLevelAvailable(window.blocksData, blockIndex, 0, block) : true;
 const btnHTML = firstAvailable
     ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
     : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
