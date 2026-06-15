@@ -1,6 +1,7 @@
 package su.itgalley
 
 import kotlinx.serialization.json.Json
+import org.flywaydb.core.Flyway
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import su.itgalley.database.config.DatabaseConfig
@@ -22,7 +23,6 @@ import su.itgalley.database.seed.InputBlock
 import su.itgalley.database.seed.convertBlocksToSeedData
 import java.io.File
 import java.util.Properties
-import org.flywaydb.core.Flyway
 
 fun main() {
     val config = loadDatabaseConfig()
