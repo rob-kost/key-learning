@@ -23,6 +23,7 @@ let currentLevelId = null; // глобальная переменная для �
     let tasksQueue = [];
     let currentTaskIndex = 0;
     let blocksData = [];
+window.blocksData = blocksData;
 let completedLevels = JSON.parse(localStorage.getItem('completedLevels')) || [];
 window.completedLevels = completedLevels;
 
@@ -61,13 +62,13 @@ restartBtn.addEventListener('click', () => {
 });
 
 window.renderHomePage=function() {
-    const blockListHTML = blocksData.length
-        ? blocksData.map((b, i) =>
+    const blockListHTML = window.blocksData.length
+        ? window.blocksData.map((b, i) =>
             `<h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;">${i+1}. ${b.name}</h3>`
         ).join('')
         : '<p style="color:#aaa;">Нет доступных блоков</p>';
 
-    const firstBlock = blocksData[0] || null;
+    const firstBlock = window.blocksData[0] || null;
 
     const html = marked.parse(HOME_PRE_MD) +
         (firstBlock ? `<button id="startLearningBtn" class="block-start-btn">Начать обучение</button>` : '') +
@@ -97,6 +98,7 @@ window.getLevelName=function(levelId) {
 }
 
     let currentBlockIndex = 0;
+window.currentBlockIndex = currentBlockIndex;
 	let activeHelpContent = null;
     let textKeyDownHandler = null;
     let hkKeyDownHandler = null;
@@ -372,7 +374,7 @@ window.showBlockPage=function(block) {
     if (main) main.classList.add('static-mode');
     const sp = document.getElementById('staticPage');
     if (!sp) return;
-    const firstAvailable = isLevelAvailable(blocksData, blocksData.indexOf(block), 0, block);
+    const firstAvailable = isLevelAvailable(window.blocksData, window.blocksData.indexOf(block), 0, block);
 const btnHTML = firstAvailable
     ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
     : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
@@ -547,9 +549,9 @@ if (restartLevel) {
 }
 
 window.advanceToNextBlock=function() {
-    const nextIndex = currentBlockIndex + 1;
-    if (nextIndex < blocksData.length) {
-        const nextBlock = blocksData[nextIndex];
+    const nextIndex = window.currentBlockIndex + 1;
+    if (nextIndex < window.blocksData.length) {
+        const nextBlock = window.blocksData[nextIndex];
         showBlockPage(nextBlock);
     } else {
 	clearProgress()

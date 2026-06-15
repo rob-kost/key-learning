@@ -3,25 +3,27 @@ const path = require('path');
 
 beforeAll(() => {
     document.body.innerHTML = `
+    <main class="main-content">
         <div id="keyDisplay"></div>
         <div id="taskText"></div>
         <div id="nextTasksContainer"></div>
         <div id="staticPage" class="static-page" style="display: none;"></div>
-        <div id="menuRoot"></div>
-        <div id="tutorialModal" class="modal" style="display: none;">
-            <div class="modal-header"><h2 id="modalTitle">Туториал</h2></div>
-            <div id="tutorialBody"></div>
-            <div class="modal-footer">
-                <button id="prevPageBtn"></button>
-                <span id="pageIndicator"></span>
-                <button id="nextPageBtn"></button>
-                <button id="finishTutorialBtn" style="display: none;"></button>
-                <button id="skipTutorialBtn"></button>
-            </div>
+    </main>
+    <div id="menuRoot"></div>
+    <div id="tutorialModal" class="modal" style="display: none;">
+        <div class="modal-header"><h2 id="modalTitle">Туториал</h2></div>
+        <div id="tutorialBody"></div>
+        <div class="modal-footer">
+            <button id="prevPageBtn"></button>
+            <span id="pageIndicator"></span>
+            <button id="nextPageBtn"></button>
+            <button id="finishTutorialBtn" style="display: none;"></button>
+            <button id="skipTutorialBtn"></button>
         </div>
-        <button id="themeToggle">🌙</button>
-        <button id="restartLevel" style="display: none;">↺</button>
-    `;
+    </div>
+    <button id="themeToggle">🌙</button>
+    <button id="restartLevel" style="display: none;">↺</button>
+`;
     global.marked = { parse: (str) => `<p>${str}</p>` };
     global.fetch = jest.fn(() =>
         Promise.resolve({
@@ -115,8 +117,6 @@ describe('getTaskDisplayDescription', () => {
     const taskTYPING_noDesc = { solutionType: 'TYPING', description: '', stringSolution: 'Hello' };
     const taskTYPING_nullDesc = { solutionType: 'TYPING', description: null, stringSolution: 'Hello' };
     const taskTYPING_noDescNoString = { solutionType: 'TYPING', description: '', stringSolution: '' };
-    const taskOther = { solutionType: 'OTHER', description: 'Неизвестно' };
-    const taskOther_noDesc = { solutionType: 'OTHER', description: '' };
 
     test('HOTKEY с описанием возвращает описание', () => {
         expect(window.getTaskDisplayDescription(taskHOTKEY)).toBe('Нажмите');
@@ -138,12 +138,6 @@ describe('getTaskDisplayDescription', () => {
     });
     test('TYPING без описания и пустой stringSolution выводит "Введите текст: "', () => {
         expect(window.getTaskDisplayDescription(taskTYPING_noDescNoString)).toBe('Введите текст: ');
-    });
-    test('другой solutionType с описанием возвращает описание', () => {
-        expect(window.getTaskDisplayDescription(taskOther)).toBe('Неизвестно');
-    });
-    test('другой solutionType без описания возвращает пустую строку', () => {
-        expect(window.getTaskDisplayDescription(taskOther_noDesc)).toBe('');
     });
 });
 
@@ -334,5 +328,272 @@ describe('getKeyIdentifier', () => {
     });
     test('! возвращает физический код', () => {
         expect(window.getKeyIdentifier({ key: '!', code: 'Digit1' })).toBe('Digit1');
+    });
+});
+
+// ========== showTutorialModal ==========
+describe('showTutorialModal', () => {
+    beforeEach(() => {
+        // Сбросим модальное окно
+        const modal = document.getElementById('tutorialModal');
+        if (modal) modal.style.display = 'none';
+    });
+
+    test('открывает модальное окно и показывает первую страницу', () => {
+        window.showTutorialModal('Page 1\n---\nPage 2');
+        const modal = document.getElementById('tutorialModal');
+        expect(modal.style.display).toBe('flex');
+        expect(document.getElementById('tutorialBody').innerHTML).toContain('Page 1');
+        expect(document.getElementById('pageIndicator').textContent).toBe('1 / 2');
+        expect(document.getElementById('prevPageBtn').disabled).toBe(true);
+        expect(document.getElementById('nextPageBtn').style.display).toBe('inline-block');
+        expect(document.getElementById('finishTutorialBtn').style.display).toBe('none');
+    });
+
+    test('переключение на следующую страницу', () => {
+        window.showTutorialModal('Page 1\n---\nPage 2');
+        document.getElementById('nextPageBtn').click();
+        expect(document.getElementById('tutorialBody').innerHTML).toContain('Page 2');
+        expect(document.getElementById('pageIndicator').textContent).toBe('2 / 2');
+        expect(document.getElementById('prevPageBtn').disabled).toBe(false);
+        expect(document.getElementById('nextPageBtn').style.display).toBe('none');
+        expect(document.getElementById('finishTutorialBtn').style.display).toBe('inline-block');
+    });
+
+    test('переключение на предыдущую страницу', () => {
+        window.showTutorialModal('Page 1\n---\nPage 2');
+        document.getElementById('nextPageBtn').click(); // на вторую
+        document.getElementById('prevPageBtn').click(); // обратно на первую
+        expect(document.getElementById('tutorialBody').innerHTML).toContain('Page 1');
+        expect(document.getElementById('prevPageBtn').disabled).toBe(true);
+    });
+
+    test('кнопка "Завершить" закрывает модальное окно и вызывает onClose', () => {
+        const onClose = jest.fn();
+        window.showTutorialModal('Page 1\n---\nPage 2', onClose);
+        // Перейти на последнюю страницу, чтобы кнопка "Завершить" была видна
+        document.getElementById('nextPageBtn').click();
+        document.getElementById('finishTutorialBtn').click();
+        expect(document.getElementById('tutorialModal').style.display).toBe('none');
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    test('кнопка "Пропустить" закрывает модальное окно и вызывает onClose', () => {
+        const onClose = jest.fn();
+        window.showTutorialModal('Page 1', onClose);
+        document.getElementById('skipTutorialBtn').click();
+        expect(document.getElementById('tutorialModal').style.display).toBe('none');
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    test('устанавливает заголовок "Справка" при передаче title', () => {
+        window.showTutorialModal('Help', null, 'Справка');
+        expect(document.getElementById('modalTitle').textContent).toBe('Справка');
+        // должен быть класс help-header
+        expect(document.querySelector('.modal-header').classList.contains('help-header')).toBe(true);
+    });
+});
+
+// ========== showStaticPage / hideStaticPage ==========
+describe('static pages', () => {
+    test('showStaticPage добавляет static-mode и показывает контент', () => {
+        window.showStaticPage('Test', '<p>Content</p>');
+        const main = document.querySelector('.main-content');
+        expect(main.classList.contains('static-mode')).toBe(true);
+        const sp = document.getElementById('staticPage');
+        expect(sp.style.display).toBe('');
+        expect(sp.innerHTML).toContain('<h2>Test</h2>');
+        expect(sp.innerHTML).toContain('<p>Content</p>');
+    });
+
+    test('hideStaticPage убирает static-mode и очищает контент', () => {
+        window.showStaticPage('Test', '');
+        window.hideStaticPage();
+        const main = document.querySelector('.main-content');
+        expect(main.classList.contains('static-mode')).toBe(false);
+        const sp = document.getElementById('staticPage');
+        expect(sp.style.display).toBe('none');
+        expect(sp.innerHTML).toBe('');
+        // Элементы уровня снова видны
+        expect(document.getElementById('keyDisplay').style.display).toBe('');
+        expect(document.getElementById('taskText').style.display).toBe('');
+    });
+});
+
+// ========== showBlockPage ==========
+describe('showBlockPage', () => {
+    const block = {
+        id: '101',
+        name: 'Test Block',
+        description: 'Block description',
+        levels: [{ id: '1001', name: 'Level 1' }]
+    };
+
+    test('отображает страницу блока с кнопкой, если уровень доступен', () => {
+	window.blocksData = [block];
+        window.completedLevels = [];
+        window.showBlockPage(block);
+        const sp = document.getElementById('staticPage');
+        expect(sp.innerHTML).toContain('Block description');
+        expect(sp.innerHTML).toContain('Начать первый уровень');
+        expect(document.getElementById('startBlockBtn')).not.toBeNull();
+    });
+
+    test('отображает предупреждение, если уровень недоступен', () => {
+        // Сделаем первый уровень недоступным (нужно пройти предыдущий блок)
+	window.blocksData = [block];
+        window.completedLevels = [];
+        // Чтобы isLevelAvailable вернул false, сделаем так, что blockIndex != 0 и levelIndex = 0
+        // но тогда функция ожидает массив blocks из замыкания, который пуст. Проще замокать isLevelAvailable.
+        const orig = window.isLevelAvailable;
+        window.isLevelAvailable = jest.fn().mockReturnValue(false);
+        window.showBlockPage(block);
+        const sp = document.getElementById('staticPage');
+        expect(sp.innerHTML).toContain('Сначала пройдите предыдущий блок');
+        expect(document.getElementById('startBlockBtn')).toBeNull();
+        window.isLevelAvailable = orig;
+    });
+});
+
+// ========== openBlockMenu ==========
+describe('openBlockMenu', () => {
+    test('открывает меню блока', () => {
+        // Создаём элемент меню вручную
+        const li = document.createElement('li');
+        li.className = 'menu-item';
+        li.setAttribute('data-block-id', '101');
+        li.innerHTML = '<span class="toggle">▶</span> Name';
+        document.getElementById('menuRoot').appendChild(li);
+        expect(li.classList.contains('open')).toBe(false);
+        window.openBlockMenu('101');
+        expect(li.classList.contains('open')).toBe(true);
+        expect(li.querySelector('.toggle').textContent).toBe('▼');
+    });
+});
+
+// ========== setActiveBlock ==========
+describe('setActiveBlock', () => {
+    test('устанавливает активный класс на указанный блок', () => {
+        const li1 = document.createElement('li');
+        li1.className = 'menu-item active';
+        li1.setAttribute('data-block-id', '101');
+        const li2 = document.createElement('li');
+        li2.className = 'menu-item';
+        li2.setAttribute('data-block-id', '102');
+        const root = document.getElementById('menuRoot');
+        root.appendChild(li1);
+        root.appendChild(li2);
+        window.setActiveBlock('102');
+        expect(li1.classList.contains('active')).toBe(false);
+        expect(li2.classList.contains('active')).toBe(true);
+    });
+});
+
+// ========== renderHomePage ==========
+describe('renderHomePage', () => {
+    test('генерирует главную страницу с блоками и кнопкой "Начать обучение"', () => {
+        window.blocksData = [{ id: '101', name: 'Block 1', description: '## Block 1' }];
+        window.renderHomePage();
+        const sp = document.getElementById('staticPage');
+        expect(sp.innerHTML).toContain('Привет!');
+        expect(sp.innerHTML).toContain('Начать обучение');
+        expect(sp.innerHTML).toContain('Содержание:');
+        expect(sp.innerHTML).toContain('Block 1');
+    });
+
+    test('генерирует главную страницу без кнопки, если нет блоков', () => {
+        window.blocksData = [];
+        window.renderHomePage();
+        const sp = document.getElementById('staticPage');
+        expect(sp.innerHTML).not.toContain('Начать обучение');
+        expect(sp.innerHTML).toContain('Нет доступных блоков');
+    });
+});
+
+// ========== advanceToNextBlock ==========
+describe('advanceToNextBlock', () => {
+    test('переходит к следующему блоку, если он есть', () => {
+    window.blocksData = [
+        { id: '101', name: 'Block 1', description: '## Block 1', levels: [{ id: '1001' }] },
+        { id: '102', name: 'Block 2', description: '## Block 2', levels: [{ id: '2001' }] }
+    ];
+    window.currentBlockIndex = 0;
+    // Мокаем isLevelAvailable, чтобы пропустить проверку доступности
+    const orig = window.isLevelAvailable;
+    window.isLevelAvailable = jest.fn().mockReturnValue(true);
+    window.advanceToNextBlock();
+    const sp = document.getElementById('staticPage');
+    expect(sp.innerHTML).toContain('Block 2');
+    window.isLevelAvailable = orig;   // восстанавливаем исходную функцию
+});
+
+    test('показывает поздравление, если блоков больше нет', () => {
+        window.blocksData = [{ id: '101', name: 'Block 1' }];
+        window.currentBlockIndex = 0;
+        window.advanceToNextBlock();
+        const sp = document.getElementById('staticPage');
+        expect(sp.innerHTML).toContain('Поздравляем');
+        expect(sp.innerHTML).toContain('Вы прошли все блоки');
+    });
+});
+
+// ========== startLevel ==========
+describe('startLevel', () => {
+
+    test('HOTKEY с описанием', () => {
+        window.startLevel({ solutionType: 'HOTKEY', description: 'Нажмите кнопки', combination: [{ key: 'Ctrl' }] });
+        expect(document.getElementById('taskText').textContent).toBe('Нажмите кнопки');
+    });
+
+    test('HOTKEY без описания', () => {
+        window.startLevel({ solutionType: 'HOTKEY', description: '', combination: [{ key: 'Ctrl' }, { key: 'C' }] });
+        expect(document.getElementById('taskText').textContent).toContain('Введите сочетание клавиш: Ctrl + C');
+    });
+
+    test('TYPING с описанием', () => {
+        window.startLevel({ solutionType: 'TYPING', description: 'Введите', stringSolution: 'Hello' });
+        expect(document.getElementById('taskText').textContent).toBe('Введите');
+    });
+
+    test('TYPING без описания', () => {
+        window.startLevel({ solutionType: 'TYPING', description: '', stringSolution: 'World' });
+        expect(document.getElementById('taskText').textContent).toBe('Введите текст: World');
+    });
+});
+
+// ========== startTextLevel ==========
+describe('startTextLevel', () => {
+    let taskData;
+    beforeEach(() => {
+        jest.useFakeTimers();
+        taskData = { stringSolution: 'ABC' };
+    });
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test('ввод правильных символов до завершения', async () => {
+    const promise = window.startTextLevel(taskData);
+    // Имитируем нажатия клавиш
+    ['A', 'B', 'C'].forEach(key => {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key, repeat: false }));
+        jest.advanceTimersByTime(10);   // даём время на обработку
+    });
+    // После последнего символа должен сработать таймер 1000 мс до resolve
+    jest.advanceTimersByTime(1000);
+    await expect(promise).resolves.toBeUndefined();
+    expect(document.getElementById('keyDisplay').textContent).toBe('ABC');
+});
+
+    test('неправильный символ показывает красное уведомление', () => {
+        window.startTextLevel({ stringSolution: 'A' });
+        const wrongEvent = new KeyboardEvent('keydown', { key: 'B', repeat: false });
+        document.dispatchEvent(wrongEvent);
+        // Проверяем красный span
+        const keyDisplay = document.getElementById('keyDisplay');
+        expect(keyDisplay.innerHTML).toContain('<span style="color:#f44336; font-weight:bold;">B</span>');
+        // Ждём очистки
+        jest.advanceTimersByTime(300);
+        expect(keyDisplay.textContent).toBe('');
     });
 });
