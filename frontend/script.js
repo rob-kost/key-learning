@@ -89,13 +89,13 @@ skipBtn1.addEventListener('click', () => {
 }
 
 window.renderHomePage=function() {
-    const blockListHTML = window.blocksData.length
-        ? window.blocksData.map((b, i) =>
-            `<h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;">${i+1}. ${b.name}</h3>`
-        ).join('')
+	const data = window.blocksData || [];
+
+     const blockListHTML = data.length
+       ? data.map((b, i) => `<h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;">${i+1}. ${b.name}</h3>`).join('')
         : '<p style="color:#aaa;">Нет доступных блоков</p>';
 
-    const firstBlock = window.blocksData[0] || null;
+    const firstBlock = data[0] || null;
 
     const html = marked.parse(HOME_PRE_MD) +
         (firstBlock ? `<button id="startLearningBtn" class="block-start-btn">Начать обучение</button>` : '') +
@@ -545,7 +545,7 @@ if (levelItem && !toggle) {
             // Клик по блоку
             if (menuItem && !menuItem.classList.contains('home-item') && menuItem.hasAttribute('data-block-id')) {
                 const blockId = menuItem.getAttribute('data-block-id');
-                const block = blocksData.find(b => b.id === blockId);
+                const block = window.blocksData ? window.blocksData.find(b => b.id === blockId) : null;
                 if (block) showBlockPage(block);
                 return;
             }
@@ -623,7 +623,7 @@ window.advanceToNextBlock=function() {
 restartBtn.style.display = 'flex'; // показать кнопку
 if (skipBtn1) skipBtn1.style.display = 'flex';
     const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
-	currentLevelName = getLevelName(levelId);
+	
     if (block) currentBlockIndex = blocksData.indexOf(block);
 
     display.textContent = 'Загрузка...';
@@ -637,6 +637,7 @@ if (skipBtn1) skipBtn1.style.display = 'flex';
         showNotification('Ошибка загрузки уровня');
         return;
     }
+currentLevelName = getLevelName(levelId);
 activeHelpContent = levelData.help || null;
 
     const subtasks = levelData.subtasks || [];
@@ -685,7 +686,7 @@ nextTaskElements.forEach(el => el.textContent = '');
 
         // Через 2 секунды переходим к следующему уровню или блоку
         setTimeout(() => {
-            const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
+            const block = window.blocksData ? window.blocksData.find(b => b.levels.some(l => l.id === levelId)) : null;
             if (block) {
                 const currentLevelIndex = block.levels.findIndex(l => l.id === levelId);
                 const nextLevel = block.levels[currentLevelIndex + 1];
