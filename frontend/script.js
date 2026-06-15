@@ -146,7 +146,7 @@ const HOME_PRE_MD = `## Привет!
 
 В самом начале мы познакомимся с клавиатурой и её возможностями. После - выучим несколько простых сочетаний клавиш. Если ты готов - жми кнопку ниже!
 
-Примечание: Видите правую панель, с иконками книжки и знака вопроса? Это не просто картинки. 
+Примечание: Видите правую панель, с иконками книжки и знака вопроса? Это не просто картинки.
 Книжка - туториал. При нажатии она повторяет обучение, которое вы уже просмотрели перед стартом уровня, если что-то забыли.
 Знак вопроса - справка. Он содержит подсказки к прохождению уровня.`;
 
@@ -422,7 +422,8 @@ window.setActiveBlock=function(blockId) {
     if (active) active.classList.add('active');
 }
 
-window.isLevelAvailable=function(blocks, blockIndex, levelIndex, block) {
+/* ========== ИЗМЕНЕНИЕ: объявление функции isLevelAvailable ========== */
+function isLevelAvailable(blocks, blockIndex, levelIndex, block) {
     if (blockIndex === 0 && levelIndex === 0) return true;
     if (levelIndex > 0) {
         const prevLevelId = block.levels[levelIndex - 1].id;
@@ -447,7 +448,7 @@ window.buildMenu=function(blocks) {
                     <ul class="submenu">
                         ${block.levels.map((level, idx) => {
     const available = isLevelAvailable(blocks, index, idx, block);
-    return `<li data-level-id="${level.id}" data-level-name="${level.name}" 
+    return `<li data-level-id="${level.id}" data-level-name="${level.name}"
                 class="${available ? '' : 'disabled'}"
                 style="${available ? '' : 'color: #666; cursor: not-allowed;'}">
                 • ${level.name} ${idx === block.levels.length - 1 ? '⭐' : ''}
@@ -626,7 +627,7 @@ activeHelpContent = levelData.help || null;
                 const nextLevel = block.levels[currentLevelIndex + 1];
                 if (nextLevel) {
                     // Запускаем следующий уровень этого же блока
-			hideStaticPage(); 
+			hideStaticPage();
                     startLevelSequence(nextLevel.id);
                 } else {
                     // Все уровни блока пройдены — переходим к следующему блоку
@@ -875,10 +876,10 @@ const expectedId = getExpectedIdentifier(expected.key);
 
 function onKeyUp(event) {
                 if (event.repeat || finished) return;
-		if (sequentialMode) return;	
+		if (sequentialMode) return;
 
                 const id = getKeyIdentifier(event);       // идентификатор отпущенной клавиши
-    pressedKeys.delete(id);	
+    pressedKeys.delete(id);
 
                 if (pressedKeys.size === 0) {
                     currentStep = 0;
@@ -970,7 +971,7 @@ window.preventSystemShortcuts=function(e) {
     if (
         (ctrl && key === 't') ||
         (ctrl && key === 'n') ||
-        (ctrl && shift && key === 'n') ||  
+        (ctrl && shift && key === 'n') ||
         (ctrl && key === 'Tab') ||         // переключение вкладок (мы не можем полностью заблокировать, но попытка есть)
         (ctrl && shift && key === 'Tab')
     ) {
@@ -1060,8 +1061,8 @@ function onKeyDown(event) {
             // Игнорируем служебные клавиши (Shift, Ctrl, Alt, Meta и др.) и длинные комбинации
             if (key.length > 1 && key !== ' ') return;
 
-            // Дополнительно: если нажата клавиша с модификатором (например, Ctrl+C), 
-            // то event.key может быть "c" при зажатом Ctrl, но само событие keydown 
+            // Дополнительно: если нажата клавиша с модификатором (например, Ctrl+C),
+            // то event.key может быть "c" при зажатом Ctrl, но само событие keydown
             // для символа "c" пройдёт. Это нормально, так как пользователь хочет ввести "c".
             // Служебные клавиши сами по себе не проходят из-за длины.
 
