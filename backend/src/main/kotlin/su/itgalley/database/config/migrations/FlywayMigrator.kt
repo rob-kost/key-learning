@@ -9,7 +9,6 @@ import java.sql.SQLException
 import java.util.Properties
 import kotlin.system.exitProcess
 
-private const val EXIT_MISSING_CREDENTIALS = 2
 private const val EXIT_FLYWAY_FAILURE = 3
 
 fun main(args: Array<String>) {
