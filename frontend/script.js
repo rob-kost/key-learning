@@ -139,7 +139,6 @@ const HUMAN_TO_SYSTEM = {
     'Esc': 'Escape',
     'Enter': 'Enter',
     'Tab': 'Tab',
-    'Space': ' '
     'Backspace': 'Backspace',
     '↑': 'ArrowUp',
     '↓': 'ArrowDown',
@@ -203,7 +202,7 @@ const UNTRACKED_KEYS = [
 
 
 window.displayKey=function(k) {
-    if (k === 'Space' || k === ' ') return 'Пробел';
+    if (k === 'Space' || k === ' ') return 'Space';
     return SYSTEM_TO_HUMAN[k] || k;
 }
 
@@ -401,14 +400,30 @@ window.showBlockPage=function(block) {
     if (main) main.classList.add('static-mode');
     const sp = document.getElementById('staticPage');
     if (!sp) return;
+
     const blockIndex = window.blocksData ? window.blocksData.indexOf(block) : -1;
-const firstAvailable = blockIndex >= 0 ? isLevelAvailable(window.blocksData, blockIndex, 0, block) : true;
-const btnHTML = firstAvailable
-    ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
-    : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
-sp.innerHTML = marked.parse(block.description) + btnHTML;
+    let firstAvailable = true;
+    try {
+        firstAvailable = blockIndex >= 0 ? isLevelAvailable(window.blocksData, blockIndex, 0, block) : true;
+    } catch (e) {
+        console.error('Ошибка в isLevelAvailable:', e);
+    }
+
+    const btnHTML = firstAvailable
+        ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
+        : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
+
+    try {
+        const desc = typeof block.description === 'string' ? block.description : '';
+        sp.innerHTML = marked.parse(desc) + btnHTML;
+    } catch (e) {
+        console.error('Ошибка при разборе описания блока:', e);
+        sp.innerHTML = '<p>Не удалось загрузить описание блока</p>' + btnHTML;
+    }
+
     setActiveBlock(block.id);
     openBlockMenu(block.id);
+
     const btn = document.getElementById('startBlockBtn');
     if (btn) {
         btn.addEventListener('click', () => {
@@ -416,7 +431,7 @@ sp.innerHTML = marked.parse(block.description) + btnHTML;
             startLevelSequence(block.levels[0].id);
         }, { once: true });
     }
-}
+};
 
     // ========== ЗАГРУЗКА НАВИГАЦИИ ==========
     async function fetchNavigationData() {
@@ -449,15 +464,19 @@ window.setActiveBlock=function(blockId) {
     if (active) active.classList.add('active');
 }
 
-window.isLevelAvailable=function(blocks, blockIndex, levelIndex, block) {
-    if (blockIndex === 0 && levelIndex === 0) return true;
-    if (levelIndex > 0) {
-        const prevLevelId = block.levels[levelIndex - 1].id;
-        return window.completedLevels.includes(prevLevelId);
+window.isLevelAvailable = function(blocks, blockIndex, levelIndex, block) {
+    // Нулевой блок (первый блок в списке) – всегда доступен весь
+    if (blockIndex === 0) return true;
+    // В остальных блоках:
+    if (levelIndex === 0) {
+        // Первый уровень блока доступен, только если все уровни предыдущего блока пройдены
+        const prevBlock = blocks[blockIndex - 1];
+        return prevBlock.levels.every(l => window.completedLevels.includes(l.id));
     }
-    const prevBlock = blocks[blockIndex - 1];
-    return prevBlock.levels.every(l => window.completedLevels.includes(l.id));
-}
+    // Второй и последующие уровни блока доступны, если предыдущий уровень этого же блока пройден
+    const prevLevelId = block.levels[levelIndex - 1].id;
+    return window.completedLevels.includes(prevLevelId);
+};
 
 window.buildMenu=function(blocks) {
         const menuRoot = document.getElementById('menuRoot');
@@ -634,22 +653,27 @@ activeHelpContent = levelData.help || null;
 		saveProgress(levelId, currentTaskIndex);
         }
 
-                // Все подзадачи уровня пройдены
-	clearProgress();
-	if (restartBtn) restartBtn.style.display = 'none';
+       // Все подзадачи уровня пройдены
+clearProgress();
+if (restartBtn) restartBtn.style.display = 'none';
+if (skipBtn1) skipBtn1.style.display = 'none';
 
-if (skipBtn1) skipBtn1.style.display = 'none';	
-	if (!completedLevels.includes(levelId)) {
+if (!completedLevels.includes(levelId)) {
     completedLevels.push(levelId);
     localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
 }
-// Обновить меню, чтобы отразить доступность уровней
 if (window.blocksData && window.blocksData.length) {
     buildMenu(window.blocksData);
 }
 
-	currentLevelName = levelName;
-        display.textContent = `Уровень "${levelName}" пройден!`;
+const levelName = getLevelName(levelId);        // <-- объявляем до использования
+currentLevelName = levelName;
+display.textContent = `Уровень "${levelName}" пройден!`;
+adjustFontSize(display);
+display.style.color = '#4caf50';
+taskTextEl.textContent = '';
+nextTaskElements.forEach(el => el.textContent = '');
+// ... далее setTimeout и переход
         adjustFontSize(display);
         display.style.color = '#4caf50';
         taskTextEl.textContent = '';
