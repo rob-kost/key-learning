@@ -121,7 +121,6 @@ jobs:
             set -e
             cd /tmp
             unzip -o backend.zip -d backend-dist
-            # находим Unix-скрипт и копируем с фиксированным именем
             BIN_SCRIPT=$(find backend-dist -type f -path '*/bin/*' ! -name '*.bat' | head -1)
             if [ -z "$BIN_SCRIPT" ]; then
               echo "ERROR: start script not found" >&2
@@ -129,26 +128,32 @@ jobs:
             fi
             cp "$BIN_SCRIPT" /opt/keylearning/backend/bin/key-learning-backend
             chmod +x /opt/keylearning/backend/bin/key-learning-backend
-            # копируем jar-файлы
             rm -rf /opt/keylearning/backend/lib/*
             cp backend-dist/*/lib/*.jar /opt/keylearning/backend/lib/ 2>/dev/null || true
           REMOTE
 
       - name: Create backend .env file with DB secrets
         run: |
-          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'REMOTE'
-            cat << EOF > /opt/keylearning/backend/.env
+          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cat > /opt/keylearning/backend/.env << 'EOF'
             DB_HOST=${{ secrets.DB_HOST }}
             DB_PORT=${{ secrets.DB_PORT }}
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             EOF
-          REMOTE
+          "
+
+      - name: Run Flyway migrations
+        run: |
+          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            set -a
+            source /opt/keylearning/backend/.env
+            set +a
+            java -cp '/opt/keylearning/backend/lib/*' su.itgalley.database.config.migrations.FlywayMigrator migrate
+          "
 
       - name: Copy frontend files to server
         run: |
-          # артефакт frontend содержит содержимое папки frontend (не саму папку)
           scp -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no -r * ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/keylearning/frontend/
 
       - name: Install frontend dependencies on server
