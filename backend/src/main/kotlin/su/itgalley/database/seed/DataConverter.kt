@@ -52,10 +52,10 @@ fun convertBlocksToSeedData(blocks: List<InputBlock>): SeedData {
         return keyRefMap.getOrPut(keyName) {
             val controlKeys =
                 setOf(
-                    "Control", "Shift", "Alt", "Meta",
+                    "Ctrl", "Shift", "Alt", "Meta",
                     "Home", "End", "PageUp", "PageDown",
                     "Insert", "Delete", "Backspace",
-                    "Tab", "Enter", "Escape",
+                    "Tab", "Enter", "Escape", "Space",
                     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
                     "CapsLock", "NumLock", "ScrollLock",
                     "Pause", "PrintScreen", "ContextMenu",
