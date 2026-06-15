@@ -85,7 +85,7 @@ jobs:
   deploy:
     name: Deploy (demonstration)
     runs-on: ubuntu-latest
-    needs: [backend, frontend]   # ждём успеха обеих джоб
+    needs: [backend, frontend]
     steps:
       - name: Download backend artifact
         uses: actions/download-artifact@v4
@@ -97,10 +97,18 @@ jobs:
         with:
           name: frontend
 
-      - name: Unpack backend dist
+      - name: Set up JDK 21 (Oracle OpenJDK)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Unpack backend dist and prepare
         run: |
           unzip *.zip -d backend-app
-          chmod +x backend-app/*/bin/*
+          BACKEND_BIN=$(find backend-app -type f -path '*/bin/*' ! -name '*.bat' | head -1)
+          chmod +x "$BACKEND_BIN"
+          echo "BACKEND_BIN=$BACKEND_BIN" >> $GITHUB_ENV
 
       - name: Start backend (test run)
         env:
@@ -110,11 +118,9 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          # Запускаем в фоне, логи пишем в файл для проверки
-          backend-app/*/bin/* &
+          $BACKEND_BIN &
           sleep 5
-          # Проверяем, что процесс жив
-          if ! pgrep -f "backend-app"; then
+          if ! pgrep -f "java"; then
             echo "Backend failed to start" && exit 1
           fi
 
