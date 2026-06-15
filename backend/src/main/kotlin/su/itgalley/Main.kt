@@ -45,9 +45,13 @@ private fun loadDatabaseConfig(): DbConfig {
     }
 
     // Пытаемся получить значение: сначала из переменной окружения, потом из файла
-    fun getValue(envVar: String, propertyKey: String, default: String? = null): String {
+    fun getValue(
+        envVar: String,
+        propertyKey: String,
+        default: String? = null,
+    ): String {
         return System.getenv(envVar) ?: loadFromFileOrNull()?.getProperty(propertyKey) ?: default
-        ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
+            ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
     }
 
     val dbHost = getValue("DB_HOST", "db.host", "localhost")
