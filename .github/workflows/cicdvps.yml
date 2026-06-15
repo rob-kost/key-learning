@@ -84,6 +84,7 @@ jobs:
           path: |
             frontend/**
             !frontend/node_modules/**
+
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
@@ -134,16 +135,19 @@ jobs:
             cp backend-dist/*/lib/*.jar /opt/keylearning/backend/lib/ 2>/dev/null || true
           REMOTE
 
-      - name: Create backend .env file with DB secrets
+      - name: Create .env file locally
         run: |
-          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cat > /opt/keylearning/backend/.env << 'EOF'
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            EOF
-          "
+          cat > .env << EOF
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          EOF
+
+      - name: Copy .env to server
+        run: |
+          scp -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/keylearning/backend/.env
 
       - name: Run Flyway migrations
         run: |
