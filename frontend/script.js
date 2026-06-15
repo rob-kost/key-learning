@@ -62,10 +62,11 @@ restartBtn.addEventListener('click', () => {
     location.reload();
 });
 
-const skipBtn = document.getElementById('skipLevelBtn');
-    skipBtn.style.display = 'flex';
+const skipBtn1 = document.getElementById('skipLevelBtn');
+if(skipBtn1){
+    skipBtn1.style.display = 'flex';
 
-skipBtn.addEventListener('click', () => {
+skipBtn1.addEventListener('click', () => {
     if (!currentLevelId) return;
     if (!completedLevels.includes(currentLevelId)) {
         completedLevels.push(currentLevelId);
@@ -85,6 +86,7 @@ skipBtn.addEventListener('click', () => {
         }
     }
 });
+}
 
 window.renderHomePage=function() {
     const blockListHTML = window.blocksData.length
@@ -590,7 +592,7 @@ window.advanceToNextBlock=function() {
 	hideStaticPage();
 	currentLevelId = levelId;
 restartBtn.style.display = 'flex'; // показать кнопку
-skipBtn.style.display = 'flex';
+if (skipBtn1) skipBtn1.style.display = 'flex';
     const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
     if (block) currentBlockIndex = blocksData.indexOf(block);
 
@@ -633,6 +635,8 @@ activeHelpContent = levelData.help || null;
                 // Все подзадачи уровня пройдены
 	clearProgress();
 	if (restartBtn) restartBtn.style.display = 'none';
+
+if (skipBtn1) skipBtn1.style.display = 'none';	
 	if (!completedLevels.includes(levelId)) {
     completedLevels.push(levelId);
     localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
