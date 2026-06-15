@@ -422,8 +422,7 @@ window.setActiveBlock=function(blockId) {
     if (active) active.classList.add('active');
 }
 
-/* ========== ИЗМЕНЕНИЕ: объявление функции isLevelAvailable ========== */
-function isLevelAvailable(blocks, blockIndex, levelIndex, block) {
+window.isLevelAvailable=function(blocks, blockIndex, levelIndex, block) {
     if (blockIndex === 0 && levelIndex === 0) return true;
     if (levelIndex > 0) {
         const prevLevelId = block.levels[levelIndex - 1].id;
