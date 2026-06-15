@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main , cd-setting-branch ]
+    branches: [ main, cd-setting-branch ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, cd-setting-branch ]
 
 jobs:
   backend:
@@ -79,7 +79,7 @@ jobs:
         with:
           name: frontend
           path: |
-            frontend/**
+            frontend
             !frontend/node_modules/**
 
   deploy:
