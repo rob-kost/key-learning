@@ -420,7 +420,7 @@ window.showBlockPage=function(block) {
         console.error('Ошибка при разборе описания блока:', e);
         sp.innerHTML = '<p>Не удалось загрузить описание блока</p>' + btnHTML;
     }
-
+	    sp.style.display = '';
     setActiveBlock(block.id);
     openBlockMenu(block.id);
 
@@ -465,15 +465,11 @@ window.setActiveBlock=function(blockId) {
 }
 
 window.isLevelAvailable = function(blocks, blockIndex, levelIndex, block) {
-    // Нулевой блок (первый блок в списке) – всегда доступен весь
     if (blockIndex === 0) return true;
-    // В остальных блоках:
     if (levelIndex === 0) {
-        // Первый уровень блока доступен, только если все уровни предыдущего блока пройдены
         const prevBlock = blocks[blockIndex - 1];
         return prevBlock.levels.every(l => window.completedLevels.includes(l.id));
     }
-    // Второй и последующие уровни блока доступны, если предыдущий уровень этого же блока пройден
     const prevLevelId = block.levels[levelIndex - 1].id;
     return window.completedLevels.includes(prevLevelId);
 };
