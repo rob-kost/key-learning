@@ -155,7 +155,7 @@ jobs:
             set -a
             source /opt/keylearning/backend/.env
             set +a
-            java -cp '/opt/keylearning/backend/lib/*' su.itgalley.database.config.migrations.FlywayMigrator migrate
+            java -cp '/opt/keylearning/backend/lib/*' su.itgalley.database.config.migrations.FlywayMigratorKt migrate
           "
 
       - name: Copy frontend files to server
