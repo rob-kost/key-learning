@@ -32,7 +32,7 @@ document.getElementById('staticPage').addEventListener('click', (e) => {
     const blockLink = e.target.closest('[data-block-id]');
     if (!blockLink) return;
     const blockId = blockLink.getAttribute('data-block-id');
-    const block = blocksData.find(b => b.id === blockId);
+    const block = (window.blocksData || blocksData).find(b => b.id === blockId);
     if (block) showBlockPage(block);
 });
 
