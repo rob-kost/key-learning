@@ -162,9 +162,11 @@ class SubtaskDaoTest : DatabaseTestBase() {
 
         val withPosition = dao.getSubtasksByLevelWithPosition(graph.levelId)
         withPosition shouldHaveSize 2
-        val byId = withPosition.associate { it.first.id to it.second }
-        byId[graph.typingSubtaskId] shouldBe 1
-        byId[graph.hotkeySubtaskId] shouldBe 2
+
+        val positions = withPosition.associate { it.first.id to it.second }
+
+        positions[graph.typingSubtaskId] shouldBe 1
+        positions[graph.hotkeySubtaskId] shouldBe 2
     }
 
     @Test
