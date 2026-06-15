@@ -27,7 +27,7 @@ object DatabaseConfig {
                 jdbcUrl = config.url
                 username = config.username
                 password = config.password
-                driverClassName = "org.mariadb.jdbc.Driver"
+                // driverClassName = "org.mariadb.jdbc.Driver"
                 maximumPoolSize = config.poolSize
                 connectionTimeout = CONNECTION_TIMEOUT_MS
                 transactionIsolation = "TRANSACTION_READ_COMMITTED"
