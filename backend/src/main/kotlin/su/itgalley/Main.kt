@@ -37,35 +37,43 @@ fun main() {
 }
 
 private fun loadDatabaseConfig(): DbConfig {
-    // Лениво загружаем файл, только если он существует и нужен
     fun loadFromFileOrNull(): Properties? {
         val file = File("app.properties")
         if (!file.exists()) return null
         return Properties().apply { load(file.reader()) }
     }
 
-    // Пытаемся получить значение: сначала из переменной окружения, потом из файла
-    fun getValue(
-        envVar: String,
-        propertyKey: String,
-        default: String? = null,
-    ): String {
-        return System.getenv(envVar) ?: loadFromFileOrNull()?.getProperty(propertyKey) ?: default
+    fun getValue(envVar: String, propertyKey: String, default: String? = null): String {
+        return System.getenv(envVar)
+            ?: loadFromFileOrNull()?.getProperty(propertyKey)
+            ?: default
             ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
     }
 
-    val dbHost = getValue("DB_HOST", "db.host", "localhost")
-    val dbPort = getValue("DB_PORT", "db.port", "3306")
-    val dbName = getValue("DB_NAME", "db.base", "keyldb")
-    val dbUser = getValue("DB_USER", "db.user") // обязательно
-    val dbPassword = getValue("DB_PASSWORD", "db.password") // обязательно
+    val dbType = System.getenv("DB_TYPE") ?: "mariadb"   // по умолчанию MariaDB
 
-    return DbConfig(
-        url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
-        username = dbUser,
-        password = dbPassword,
-        poolSize = 10,
-    )
+    return if (dbType.equals("h2", ignoreCase = true)) {
+        // H2 in-memory, не требует пароля
+        DbConfig(
+            url = "jdbc:h2:mem:keyldb;DB_CLOSE_DELAY=-1",
+            username = "sa",
+            password = "",
+            poolSize = 10,
+        )
+    } else {
+        val dbHost = getValue("DB_HOST", "db.host", "localhost")
+        val dbPort = getValue("DB_PORT", "db.port", "3306")
+        val dbName = getValue("DB_NAME", "db.base", "keyldb")
+        val dbUser = getValue("DB_USER", "db.user")
+        val dbPassword = getValue("DB_PASSWORD", "db.password")
+
+        DbConfig(
+            url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
+            username = dbUser,
+            password = dbPassword,
+            poolSize = 10,
+        )
+    }
 }
 
 private fun createDaoRegistry(): DaoRegistry {

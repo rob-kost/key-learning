@@ -32,7 +32,7 @@ val serializationJsonVersion = "1.11.0"
 
 dependencies {
 
-    runtimeOnly("com.h2database:h2:2.2.224") // только для проверки работоспособности сборки
+    runtimeOnly("com.h2database:h2:2.2.224") // только для проверки работоспособности сборки, но как выяснилось не только :)
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     // HTTP4K
