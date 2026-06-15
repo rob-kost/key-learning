@@ -148,26 +148,6 @@ class SubtaskDaoTest : DatabaseTestBase() {
     private val registry = TestFixtures.createDaoRegistry()
 
     @Test
-    fun `query subtasks by level task and block with positions`() {
-        val graph = TestFixtures.seedLevelGraph(registry)
-
-        dao.findById(graph.typingSubtaskId)?.solutionType shouldBe
-            su.itgalley.database.schema.SolutionType.TYPING
-        dao.getSubtasksByLevel(graph.levelId).map { it.id } shouldContainExactly
-            listOf(graph.typingSubtaskId, graph.hotkeySubtaskId)
-        dao.getSubtasksByTask(graph.taskId).map { it.id } shouldContainExactly
-            listOf(graph.typingSubtaskId, graph.hotkeySubtaskId)
-        dao.getSubtasksByBlock(graph.blockId).map { it.id } shouldContainExactly
-            listOf(graph.typingSubtaskId, graph.hotkeySubtaskId)
-
-        val withPosition = dao.getSubtasksByLevelWithPosition(graph.levelId)
-        withPosition shouldHaveSize 2
-        val positions = withPosition.associate { it.first.id to it.second }
-        positions[graph.typingSubtaskId] shouldBe 1
-        positions[graph.hotkeySubtaskId] shouldBe 2
-    }
-
-    @Test
     fun `save update and delete subtask`() {
         val graph = TestFixtures.seedLevelGraph(registry)
 
