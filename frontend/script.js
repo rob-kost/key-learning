@@ -18,6 +18,7 @@
 
 const restartBtn = document.getElementById('restartLevel');
 let currentLevelId = null; // глобальная переменная для текущего уровня
+let currentLevelName = '';
 
     let activeTutorialContent = null;
     let tasksQueue = [];
@@ -60,6 +61,32 @@ restartBtn.addEventListener('click', () => {
     sessionStorage.setItem('restartLevel', currentLevelId);
     location.reload();
 });
+
+const skipBtn1 = document.getElementById('skipLevelBtn');
+if(skipBtn1){
+    skipBtn1.style.display = 'flex';
+
+skipBtn1.addEventListener('click', () => {
+    if (!currentLevelId) return;
+    if (!completedLevels.includes(currentLevelId)) {
+        completedLevels.push(currentLevelId);
+        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+    }
+    clearProgress();
+    // Переход к следующему уровню (как в конце startLevelSequence)
+    const block = blocksData.find(b => b.levels.some(l => l.id === currentLevelId));
+    if (block) {
+        const currentLevelIndex = block.levels.findIndex(l => l.id === currentLevelId);
+        const nextLevel = block.levels[currentLevelIndex + 1];
+        if (nextLevel) {
+            hideStaticPage();
+            startLevelSequence(nextLevel.id);
+        } else {
+            advanceToNextBlock();
+        }
+    }
+});
+}
 
 window.renderHomePage=function() {
     const blockListHTML = window.blocksData.length
@@ -113,7 +140,6 @@ const HUMAN_TO_SYSTEM = {
     'Enter': 'Enter',
     'Tab': 'Tab',
     'Backspace': 'Backspace',
-    'Space': ' ',
     '↑': 'ArrowUp',
     '↓': 'ArrowDown',
     '←': 'ArrowLeft',
@@ -176,7 +202,7 @@ const UNTRACKED_KEYS = [
 
 
 window.displayKey=function(k) {
-    if (k === 'Space' || k === ' ') return 'Пробел';
+    if (k === 'Space' || k === ' ') return 'Space';
     return SYSTEM_TO_HUMAN[k] || k;
 }
 
@@ -374,14 +400,30 @@ window.showBlockPage=function(block) {
     if (main) main.classList.add('static-mode');
     const sp = document.getElementById('staticPage');
     if (!sp) return;
+
     const blockIndex = window.blocksData ? window.blocksData.indexOf(block) : -1;
-const firstAvailable = blockIndex >= 0 ? isLevelAvailable(window.blocksData, blockIndex, 0, block) : true;
-const btnHTML = firstAvailable
-    ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
-    : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
-sp.innerHTML = marked.parse(block.description) + btnHTML;
+    let firstAvailable = true;
+    try {
+        firstAvailable = blockIndex >= 0 ? isLevelAvailable(window.blocksData, blockIndex, 0, block) : true;
+    } catch (e) {
+        console.error('Ошибка в isLevelAvailable:', e);
+    }
+
+    const btnHTML = firstAvailable
+        ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
+        : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
+
+    try {
+        const desc = typeof block.description === 'string' ? block.description : '';
+        sp.innerHTML = marked.parse(desc) + btnHTML;
+    } catch (e) {
+        console.error('Ошибка при разборе описания блока:', e);
+        sp.innerHTML = '<p>Не удалось загрузить описание блока</p>' + btnHTML;
+    }
+
     setActiveBlock(block.id);
     openBlockMenu(block.id);
+
     const btn = document.getElementById('startBlockBtn');
     if (btn) {
         btn.addEventListener('click', () => {
@@ -389,7 +431,7 @@ sp.innerHTML = marked.parse(block.description) + btnHTML;
             startLevelSequence(block.levels[0].id);
         }, { once: true });
     }
-}
+};
 
     // ========== ЗАГРУЗКА НАВИГАЦИИ ==========
     async function fetchNavigationData() {
@@ -422,15 +464,19 @@ window.setActiveBlock=function(blockId) {
     if (active) active.classList.add('active');
 }
 
-window.isLevelAvailable=function(blocks, blockIndex, levelIndex, block) {
-    if (blockIndex === 0 && levelIndex === 0) return true;
-    if (levelIndex > 0) {
-        const prevLevelId = block.levels[levelIndex - 1].id;
-        return window.completedLevels.includes(prevLevelId);
+window.isLevelAvailable = function(blocks, blockIndex, levelIndex, block) {
+    // Нулевой блок (первый блок в списке) – всегда доступен весь
+    if (blockIndex === 0) return true;
+    // В остальных блоках:
+    if (levelIndex === 0) {
+        // Первый уровень блока доступен, только если все уровни предыдущего блока пройдены
+        const prevBlock = blocks[blockIndex - 1];
+        return prevBlock.levels.every(l => window.completedLevels.includes(l.id));
     }
-    const prevBlock = blocks[blockIndex - 1];
-    return prevBlock.levels.every(l => window.completedLevels.includes(l.id));
-}
+    // Второй и последующие уровни блока доступны, если предыдущий уровень этого же блока пройден
+    const prevLevelId = block.levels[levelIndex - 1].id;
+    return window.completedLevels.includes(prevLevelId);
+};
 
 window.buildMenu=function(blocks) {
         const menuRoot = document.getElementById('menuRoot');
@@ -513,6 +559,7 @@ if (menuItem && menuItem.classList.contains('home-item')) {
     fetchNavigationData()
     .then(blocks => {
         blocksData = blocks;
+	window.blocksData = blocksData;
         buildMenu(blocks);
         const saved = loadProgress();
         if (saved && saved.levelId) {
@@ -565,7 +612,9 @@ window.advanceToNextBlock=function() {
 	hideStaticPage();
 	currentLevelId = levelId;
 restartBtn.style.display = 'flex'; // показать кнопку
+if (skipBtn1) skipBtn1.style.display = 'flex';
     const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
+	currentLevelName = getLevelName(levelId);
     if (block) currentBlockIndex = blocksData.indexOf(block);
 
     display.textContent = 'Загрузка...';
@@ -604,15 +653,27 @@ activeHelpContent = levelData.help || null;
 		saveProgress(levelId, currentTaskIndex);
         }
 
-                // Все подзадачи уровня пройдены
-	clearProgress();
-	if (restartBtn) restartBtn.style.display = 'none';
-	if (!completedLevels.includes(levelId)) {
+       // Все подзадачи уровня пройдены
+clearProgress();
+if (restartBtn) restartBtn.style.display = 'none';
+if (skipBtn1) skipBtn1.style.display = 'none';
+
+if (!completedLevels.includes(levelId)) {
     completedLevels.push(levelId);
     localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
 }
-        const levelName = getLevelName(levelId);
-        display.textContent = `Уровень "${levelName}" пройден!`;
+if (window.blocksData && window.blocksData.length) {
+    buildMenu(window.blocksData);
+}
+
+const levelName = getLevelName(levelId);        // <-- объявляем до использования
+currentLevelName = levelName;
+display.textContent = `Уровень "${levelName}" пройден!`;
+adjustFontSize(display);
+display.style.color = '#4caf50';
+taskTextEl.textContent = '';
+nextTaskElements.forEach(el => el.textContent = '');
+// ... далее setTimeout и переход
         adjustFontSize(display);
         display.style.color = '#4caf50';
         taskTextEl.textContent = '';
@@ -647,22 +708,23 @@ activeHelpContent = levelData.help || null;
 
     // ========== ЗАПУСК ОДНОГО УРОВНЯ ==========
 window.startLevel=function(taskData) {
+	const prefix = currentLevelName ? `[${currentLevelName}] ` : '';
     if (taskData.solutionType === 'HOTKEY') {
         if (taskData.description && taskData.description.trim() !== '') {
             taskTextEl.textContent = taskData.description;
         } else {
             const keys = taskData.combination.map(k => displayKey(k.key)).join(' + ');
-            taskTextEl.textContent = 'Введите сочетание клавиш: ' + keys;
+            taskTextEl.textContent = prefix + 'Введите сочетание клавиш: ' + keys;
         }
     } else if (taskData.solutionType === 'TYPING') {
         if (taskData.description && taskData.description.trim() !== '') {
-            taskTextEl.textContent = taskData.description;
+            taskTextEl.textContent = prefix + taskData.description;
         } else {
             const target = taskData.stringSolution || taskData.description || '';
-            taskTextEl.textContent = 'Введите текст: ' + target;
+            taskTextEl.textContent = prefix + 'Введите текст: ' + target;
         }
     } else {
-        taskTextEl.textContent = taskData.description || '';
+        taskTextEl.textContent = prefix + (taskData.description || '');
     }
 
     return new Promise((resolve) => {
@@ -710,7 +772,9 @@ window.startHKLevel=function(taskData) {
             display.style.color = '';
 
             const steps = [...taskData.combination];
-	const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key));
+	const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key)) ||
+    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'W')) ||
+    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'T'));
 	if (sequentialMode) {
     taskTextEl.textContent += ' (вводите клавиши по одной)';
 }
@@ -790,11 +854,12 @@ if (sequentialMode) {
     if (rawKey === ' ') rawKey = ' ';
     lastErrorKey = SYSTEM_TO_HUMAN[rawKey] || rawKey;
 
-    if (id === expectedId) {
+        if (id === expectedId) {
+        error = false;
+        lastErrorKey = null;
         currentStep++;
         if (currentStep === steps.length) {
             finished = true;
-
             if (hkKeyDownHandler) document.removeEventListener('keydown', hkKeyDownHandler);
             if (hkKeyUpHandler) document.removeEventListener('keyup', hkKeyUpHandler);
             hkKeyDownHandler = null;
@@ -803,11 +868,10 @@ if (sequentialMode) {
                 activeTutorialContent = null;
                 resolve();
             }, 1000);
-        } else {
-            lastErrorKey = null;
         }
+    } else {
+        error = true;
     }
-    // ошибка: lastErrorKey уже установлен
     render();
     return;
 }
