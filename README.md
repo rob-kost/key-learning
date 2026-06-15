@@ -1,25 +1,3 @@
-### Подготовка к запуску
-Для начала работы с проектом необходимо подготовить СУБД
-1. В DockerDesktop в терминале запускаем следующий код (возможно заменив значения параметров):
-
-```powershell
-   docker run -d `
-     --name keylearn-db `
-     -e MARIADB_DATABASE=keyldb `
-     -e MARIADB_USER=user `
-     -e MARIADB_PASSWORD=pass `
-     -e MARIADB_ROOT_PASSWORD=rootpass `
-     -p 3306:3306 `
-     -v mariadb_data:/var/lib/mysql `
-     mariadb:latest
-```
-
-2. Скопируйте шаблон настроек подключения (можно вручную, можно через терминал IntellijIDEA)
-    ```bash
-    cp app.properties.example app.properties
-    ```
-3. При необходимости внесите изменения в вашу копию файла (в соотвтетвии с изменёнными значениями на шаге 1)
-
 ### Применение миграций
 Для вывода справки необходимо выполнить следующую команду:
 ```bash
