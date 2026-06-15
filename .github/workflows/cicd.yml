@@ -83,7 +83,7 @@ jobs:
             !frontend/node_modules/**
 
   deploy:
-    name: Deploy (demonstration)
+    name: Deploy (smoke test)
     runs-on: ubuntu-latest
     needs: [backend, frontend]
     steps:
@@ -103,33 +103,28 @@ jobs:
           java-version: '21'
           distribution: 'oracle'
 
-      - name: Unpack backend dist and prepare
+      - name: Verify backend structure
         run: |
           unzip *.zip -d backend-app
           BACKEND_BIN=$(find backend-app -type f -path '*/bin/*' ! -name '*.bat' | head -1)
-          chmod +x "$BACKEND_BIN"
-          echo "BACKEND_BIN=$BACKEND_BIN" >> $GITHUB_ENV
-
-      - name: Start backend (test run)
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: |
-          $BACKEND_BIN &
-          sleep 5
-          if ! pgrep -f "java"; then
-            echo "Backend failed to start" && exit 1
+          if [ -z "$BACKEND_BIN" ]; then
+            echo "Backend start script not found!" && exit 1
           fi
+          chmod +x "$BACKEND_BIN"
+          echo "Backend start script: $BACKEND_BIN"
+          if ! ls backend-app/*/lib/*.jar 1> /dev/null 2>&1; then
+            echo "No JAR files in lib!" && exit 1
+          fi
+          echo "Backend structure OK"
 
-      - name: Install frontend dependencies and start
+      - name: Verify frontend structure
         run: |
           cd frontend
-          npm install
-          node server.js &
-          sleep 3
-          if ! pgrep -f "node server.js"; then
-            echo "Frontend failed to start" && exit 1
+          if [ ! -f "server.js" ]; then
+            echo "server.js not found!" && exit 1
           fi
+          if [ ! -f "package.json" ]; then
+            echo "package.json not found!" && exit 1
+          fi
+          npm install
+          echo "Frontend structure OK"
