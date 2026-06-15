@@ -743,7 +743,8 @@ window.startHKLevel=function(taskData) {
 
             const steps = [...taskData.combination];
 	const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key)) ||
-    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'W'));
+    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'W')) ||
+    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'T'));
 	if (sequentialMode) {
     taskTextEl.textContent += ' (вводите клавиши по одной)';
 }
