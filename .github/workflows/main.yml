@@ -39,6 +39,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Upload backend artifact (distZip)
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/build/distributions/*.zip
+
   frontend:
     name: Frontend Build & Test
     runs-on: ubuntu-latest
@@ -67,3 +73,11 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: |
+            frontend/**
+            !frontend/node_modules/**

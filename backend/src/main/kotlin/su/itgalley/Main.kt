@@ -37,33 +37,18 @@ fun main() {
 }
 
 private fun loadDatabaseConfig(): DbConfig {
-    val fileProperties =
+    val properties =
         Properties().apply {
             val propFile = File("app.properties")
-            if (propFile.exists()) {
-                load(propFile.reader())
-            }
+            if (!propFile.exists()) error("app.properties not found")
+            load(propFile.reader())
         }
 
-    fun getValue(
-        key: String,
-        default: String? = null,
-    ): String? {
-        val envKey = key.uppercase().replace(".", "_")
-        return System.getenv(envKey)
-            ?: fileProperties.getProperty(key)
-            ?: default
-    }
-
-    val dbHost = getValue("db.host", "localhost")!!
-    val dbPort = getValue("db.port", "3306")!!
-    val dbName = getValue("db.base", "keyldb")!!
-    val dbUser =
-        getValue("db.user")
-            ?: error("Missing db.user: set DB_USER env variable or provide db.user in app.properties")
-    val dbPassword =
-        getValue("db.password")
-            ?: error("Missing db.password: set DB_PASSWORD env variable or provide db.password in app.properties")
+    val dbHost = properties.getProperty("db.host", "localhost")
+    val dbPort = properties.getProperty("db.port", "3306")
+    val dbName = properties.getProperty("db.base", "keyldb")
+    val dbUser = properties.getProperty("db.user") ?: error("Missing db.user in app.properties")
+    val dbPassword = properties.getProperty("db.password") ?: error("Missing db.password in app.properties")
 
     return DbConfig(
         url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
@@ -102,11 +87,14 @@ private fun createDaoRegistry(): DaoRegistry {
 }
 
 private fun convertAndGenerateSeedData() {
-    // Получаем classloader (работает как в IDE, так и в production-дистрибутиве)
-    val classLoader = ClassLoader.getSystemClassLoader()
-    val inputStream =
-        classLoader.getResourceAsStream("KeyLearningBlock1.json")
-            ?: error("KeyLearningBlock1.json not found in classpath")
+    val inputFile = File("src/main/resources/KeyLearning_content.json")
+    val outputFile = File("src/main/resources/seed_data.json")
+
+    // Проверяем, нужно ли обновлять seed_data.json
+    if (outputFile.exists() && outputFile.lastModified() >= inputFile.lastModified()) {
+        println("seed_data.json is already up to date, conversion not required")
+        return
+    }
 
     val json =
         Json {
@@ -114,15 +102,16 @@ private fun convertAndGenerateSeedData() {
             prettyPrint = true
         }
 
-    val jsonString = inputStream.bufferedReader().use { it.readText() }
+    val jsonString = inputFile.readText()
     val simpleJson = json.decodeFromString<List<InputBlock>>(jsonString)
     val seedData = convertBlocksToSeedData(simpleJson)
 
-    // Сохраняем результат в build/resources/main/ для локальной разработки
-    val outputDir = File("build/resources/main/")
-    outputDir.mkdirs()
-    val outputFile = File(outputDir, "seed_data.json")
     outputFile.writeText(json.encodeToString(seedData))
+
+    // Копируем в build, чтобы classloader нашёл
+    val buildFile = File("build/resources/main/seed_data.json")
+    buildFile.parentFile.mkdirs()
+    buildFile.writeText(json.encodeToString(seedData))
 
     println("Conversion completed. seed_data.json file created")
 }
