@@ -99,8 +99,8 @@ private fun createDaoRegistry(): DaoRegistry {
 private fun convertAndGenerateSeedData() {
     val classLoader = ClassLoader.getSystemClassLoader()
     val inputStream =
-        classLoader.getResourceAsStream("KeyLearningBlock1.json")
-            ?: error("KeyLearningBlock1.json not found in classpath")
+        classLoader.getResourceAsStream("KeyLearning_content.json")
+            ?: error("KeyLearning_content.json not found in classpath")
 
     val json =
         Json {
@@ -116,6 +116,11 @@ private fun convertAndGenerateSeedData() {
     outputDir.mkdirs()
     val outputFile = File(outputDir, "seed_data.json")
     outputFile.writeText(json.encodeToString(seedData))
+
+    // Копируем в build, чтобы classloader нашёл
+    val buildFile = File("build/resources/main/seed_data.json")
+    buildFile.parentFile.mkdirs()
+    buildFile.writeText(json.encodeToString(seedData))
 
     println("Conversion completed. seed_data.json file created")
 }
