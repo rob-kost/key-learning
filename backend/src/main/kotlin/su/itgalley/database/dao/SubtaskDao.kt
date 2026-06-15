@@ -102,7 +102,7 @@ class SubtaskDao : BaseDao<SubTaskDto, UUID> {
             (Levels innerJoin Tasks innerJoin TaskSubtasks innerJoin Subtasks)
                 .selectAll()
                 .where { Levels.id eq levelId }
-                .orderBy(TaskSubtasks.position to SortOrder.ASC)
+                .orderBy(TaskSubtasks.position to SortOrder.ASC, Subtasks.id to SortOrder.ASC)
                 .map { row ->
                     Pair(
                         rowToSubtask(row),
