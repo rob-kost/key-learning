@@ -116,13 +116,17 @@ window.renderHomePage=function() {
 }
 
 
-window.getLevelName=function(levelId) {
-    for (const block of blocksData) {
+window.getLevelName = function(levelId) {
+    // используем глобальный массив, чтобы гарантировать актуальность
+    const data = window.blocksData || blocksData;
+    if (!data) return levelId;   // защита от вызова до загрузки
+    for (const block of data) {
         const level = block.levels.find(l => l.id === levelId);
         if (level) return level.name;
     }
-    return levelId; // fallback на ID, если имя не найдено
-}
+    console.warn('Уровень с id ' + levelId + ' не найден в блоках');
+    return levelId;   // fallback – покажет UUID, но вы увидите предупреждение
+};
 
     let currentBlockIndex = 0;
 window.currentBlockIndex = currentBlockIndex;
@@ -685,19 +689,29 @@ taskTextEl.textContent = '';
 nextTaskElements.forEach(el => el.textContent = '');
 
         // Через 2 секунды переходим к следующему уровню или блоку
-        setTimeout(() => {
-            const block = window.blocksData ? window.blocksData.find(b => b.levels.some(l => l.id === levelId)) : null;
+                setTimeout(() => {
+            // Используем глобальный массив для надёжности
+            const data = window.blocksData || blocksData;
+            const block = data.find(b => b.levels.some(l => l.id === levelId));
             if (block) {
                 const currentLevelIndex = block.levels.findIndex(l => l.id === levelId);
                 const nextLevel = block.levels[currentLevelIndex + 1];
                 if (nextLevel) {
-                    // Запускаем следующий уровень этого же блока
-			hideStaticPage(); 
+                    // Гарантируем доступность следующего уровня
+                    if (!completedLevels.includes(nextLevel.id)) {
+                        completedLevels.push(nextLevel.id);
+                        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+                    }
+                    // Обновляем меню, чтобы отразить доступность
+                    if (data.length) buildMenu(data);
+                    hideStaticPage();
                     startLevelSequence(nextLevel.id);
                 } else {
-                    // Все уровни блока пройдены — переходим к следующему блоку
                     advanceToNextBlock();
                 }
+            } else {
+                // Блок не найден – всё равно пытаемся продолжить
+                advanceToNextBlock();
             }
         }, 2000);
     };
