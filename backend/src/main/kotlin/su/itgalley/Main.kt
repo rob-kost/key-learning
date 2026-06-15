@@ -43,14 +43,18 @@ private fun loadDatabaseConfig(): DbConfig {
         return Properties().apply { load(file.reader()) }
     }
 
-    fun getValue(envVar: String, propertyKey: String, default: String? = null): String {
+    fun getValue(
+        envVar: String,
+        propertyKey: String,
+        default: String? = null,
+    ): String {
         return System.getenv(envVar)
             ?: loadFromFileOrNull()?.getProperty(propertyKey)
             ?: default
             ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
     }
 
-    val dbType = System.getenv("DB_TYPE") ?: "mariadb"   // по умолчанию MariaDB
+    val dbType = System.getenv("DB_TYPE") ?: "mariadb" // по умолчанию MariaDB
 
     return if (dbType.equals("h2", ignoreCase = true)) {
         // H2 in-memory, не требует пароля
