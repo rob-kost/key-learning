@@ -27,7 +27,6 @@ object DatabaseConfig {
                 jdbcUrl = config.url
                 username = config.username
                 password = config.password
-                // driverClassName = "org.mariadb.jdbc.Driver"
                 maximumPoolSize = config.poolSize
                 connectionTimeout = CONNECTION_TIMEOUT_MS
                 transactionIsolation = "TRANSACTION_READ_COMMITTED"
@@ -46,6 +45,9 @@ object DatabaseConfig {
                 .dataSource(dataSource)
                 .locations("classpath:db/migrations")
                 .load()
+
+        val appliedMigrations = flyway.migrate()
+        println("Applied ${appliedMigrations.migrationsExecuted} migrations")
 
         if (validateSchema) {
             validateDatabaseSchema(flyway)
@@ -67,11 +69,6 @@ object DatabaseConfig {
             flyway.validate()
 
             println("Schema validation: PASSED")
-
-            if (numPending > 0) {
-                println("There are $numPending pending migrations!")
-                println("Run FlywayMigrator to apply migrations before starting the application.")
-            }
         } catch (e: FlywayException) {
             println("Database schema validation FAILED: ${e.message}")
             exitProcess(1)
