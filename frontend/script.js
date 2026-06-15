@@ -136,7 +136,6 @@ const HUMAN_TO_SYSTEM = {
     'Win': 'Meta',
     'Alt': 'Alt',
     'Shift': 'Shift',
-    'Esc': 'Escape',
     'Enter': 'Enter',
     'Tab': 'Tab',
     'Backspace': 'Backspace',
@@ -199,6 +198,12 @@ const UNTRACKED_KEYS = [
     'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'
 ];
 
+const CYRILLIC_TO_LATIN = {
+    'Й': 'Q', 'Ц': 'W', 'У': 'E', 'К': 'R', 'Е': 'T', 'Н': 'Y', 'Г': 'U', 'Ш': 'I', 'Щ': 'O', 'З': 'P',
+    'Х': '{', 'Ъ': '}', 'Ф': 'A', 'Ы': 'S', 'В': 'D', 'А': 'F', 'П': 'G', 'Р': 'H', 'О': 'J', 'Л': 'K',
+    'Д': 'L', 'Ж': ':', 'Э': '"', 'Я': 'Z', 'Ч': 'X', 'С': 'C', 'М': 'V', 'И': 'B', 'Т': 'N', 'Ь': 'M',
+    'Б': '<', 'Ю': '>', 'Ё': '~'
+};
 
 
 window.displayKey=function(k) {
@@ -412,7 +417,7 @@ window.showBlockPage=function(block) {
     const btnHTML = firstAvailable
         ? `<button id="startBlockBtn" class="block-start-btn">Начать первый уровень</button>`
         : '<p style="color:#f44336;">Сначала пройдите предыдущий блок</p>';
-
+		    sp.style.display = '';
     try {
         const desc = typeof block.description === 'string' ? block.description : '';
         sp.innerHTML = marked.parse(desc) + btnHTML;
@@ -465,15 +470,11 @@ window.setActiveBlock=function(blockId) {
 }
 
 window.isLevelAvailable = function(blocks, blockIndex, levelIndex, block) {
-    // Нулевой блок (первый блок в списке) – всегда доступен весь
     if (blockIndex === 0) return true;
-    // В остальных блоках:
     if (levelIndex === 0) {
-        // Первый уровень блока доступен, только если все уровни предыдущего блока пройдены
         const prevBlock = blocks[blockIndex - 1];
         return prevBlock.levels.every(l => window.completedLevels.includes(l.id));
     }
-    // Второй и последующие уровни блока доступны, если предыдущий уровень этого же блока пройден
     const prevLevelId = block.levels[levelIndex - 1].id;
     return window.completedLevels.includes(prevLevelId);
 };
@@ -558,8 +559,16 @@ if (menuItem && menuItem.classList.contains('home-item')) {
 
     fetchNavigationData()
     .then(blocks => {
-        blocksData = blocks;
-	window.blocksData = blocksData;
+                // Нулевой блок всегда полностью пройден
+        if (blocks.length > 0) {
+            const zeroBlock = blocks[0];
+            zeroBlock.levels.forEach(l => {
+                if (!completedLevels.includes(l.id)) {
+                    completedLevels.push(l.id);
+                }
+            });
+            localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+        }
         buildMenu(blocks);
         const saved = loadProgress();
         if (saved && saved.levelId) {
@@ -673,11 +682,6 @@ adjustFontSize(display);
 display.style.color = '#4caf50';
 taskTextEl.textContent = '';
 nextTaskElements.forEach(el => el.textContent = '');
-// ... далее setTimeout и переход
-        adjustFontSize(display);
-        display.style.color = '#4caf50';
-        taskTextEl.textContent = '';
-        nextTaskElements.forEach(el => el.textContent = '');
 
         // Через 2 секунды переходим к следующему уровню или блоку
         setTimeout(() => {
@@ -736,8 +740,16 @@ window.startLevel=function(taskData) {
     });
 }
 
-window.getExpectedIdentifier=function(stepKey) {
-    const key = stepKey;
+window.getExpectedIdentifier = function(stepKey) {
+    let key = stepKey;
+    // Приводим одиночную латинскую букву к верхнему регистру
+    if (key.length === 1 && key.match(/[a-zA-Z]/)) {
+        key = key.toUpperCase();
+    }
+    // Если кириллическая буква – преобразуем в латиницу по раскладке
+    if (key.length === 1 && CYRILLIC_TO_LATIN[key.toUpperCase()]) {
+        key = CYRILLIC_TO_LATIN[key.toUpperCase()];
+    }
     // Человеческое имя → системное
     if (HUMAN_TO_SYSTEM[key]) return HUMAN_TO_SYSTEM[key];
     // Если это системное имя (старые данные) – вернуть как есть
@@ -755,7 +767,7 @@ window.getExpectedIdentifier=function(stepKey) {
         '^':'Digit6','&':'Digit7','*':'Digit8','(':'Digit9',')':'Digit0',
     };
     return codeMap[key] || key;
-}
+};
 
 window.getKeyIdentifier=function(event) {
     const key = event.key;

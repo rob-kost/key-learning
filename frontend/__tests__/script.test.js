@@ -103,9 +103,6 @@ describe('getExpectedIdentifier', () => {
     test('человеческое имя Win преобразуется в Meta', () => {
         expect(window.getExpectedIdentifier('Win')).toBe('Meta');
     });
-    test('человеческое имя Esc преобразуется в Escape', () => {
-        expect(window.getExpectedIdentifier('Esc')).toBe('Escape');
-    });
 });
 
 // ========== getTaskDisplayDescription ==========
