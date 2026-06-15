@@ -68,22 +68,26 @@ if(skipBtn1){
 
 skipBtn1.addEventListener('click', () => {
     if (!currentLevelId) return;
-    if (!completedLevels.includes(currentLevelId)) {
-        completedLevels.push(currentLevelId);
-        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+    if (!window.completedLevels.includes(currentLevelId)) {
+        window.completedLevels.push(currentLevelId);
+        localStorage.setItem('completedLevels', JSON.stringify(window.completedLevels));
     }
     clearProgress();
-    // Переход к следующему уровню (как в конце startLevelSequence)
-    const block = blocksData.find(b => b.levels.some(l => l.id === currentLevelId));
-    if (block) {
-        const currentLevelIndex = block.levels.findIndex(l => l.id === currentLevelId);
-        const nextLevel = block.levels[currentLevelIndex + 1];
-        if (nextLevel) {
-            hideStaticPage();
-            startLevelSequence(nextLevel.id);
-        } else {
-            advanceToNextBlock();
+    const data = window.blocksData || blocksData;
+    const block = data.find(b => b.levels.some(l => l.id === currentLevelId));
+    if (!block) return;
+    const currentLevelIndex = block.levels.findIndex(l => l.id === currentLevelId);
+    const nextLevel = block.levels[currentLevelIndex + 1];
+    if (nextLevel) {
+        if (!window.completedLevels.includes(nextLevel.id)) {
+            window.completedLevels.push(nextLevel.id);
+            localStorage.setItem('completedLevels', JSON.stringify(window.completedLevels));
         }
+        if (data.length) buildMenu(data);
+        hideStaticPage();
+        startLevelSequence(nextLevel.id);
+    } else {
+        advanceToNextBlock();
     }
 });
 }
@@ -120,7 +124,7 @@ window.getLevelName = function(levelId) {
     // используем глобальный массив, чтобы гарантировать актуальность
     const data = window.blocksData || blocksData;
     if (!data) return levelId;   // защита от вызова до загрузки
-    for (const block of data) {
+    for (const block of (window.blocksData || blocksData)) {
         const level = block.levels.find(l => l.id === levelId);
         if (level) return level.name;
     }
@@ -484,6 +488,7 @@ window.isLevelAvailable = function(blocks, blockIndex, levelIndex, block) {
 };
 
 window.buildMenu=function(blocks) {
+	window.blocksData = blocks;
         const menuRoot = document.getElementById('menuRoot');
         if (!menuRoot) return;
 
@@ -549,7 +554,7 @@ if (levelItem && !toggle) {
             // Клик по блоку
             if (menuItem && !menuItem.classList.contains('home-item') && menuItem.hasAttribute('data-block-id')) {
                 const blockId = menuItem.getAttribute('data-block-id');
-                const block = window.blocksData ? window.blocksData.find(b => b.id === blockId) : null;
+                const block = window.blocksData ? (window.blocksData || blocksData).find(b => b.id === blockId) : null;
                 if (block) showBlockPage(block);
                 return;
             }
@@ -694,27 +699,21 @@ nextTaskElements.forEach(el => el.textContent = '');
             const data = window.blocksData || blocksData;
             const block = data.find(b => b.levels.some(l => l.id === levelId));
             if (block) {
-                const currentLevelIndex = block.levels.findIndex(l => l.id === levelId);
-                const nextLevel = block.levels[currentLevelIndex + 1];
+                const nextLevel = block.levels[block.levels.findIndex(l => l.id === levelId) + 1];
                 if (nextLevel) {
-                    // Гарантируем доступность следующего уровня
                     if (!completedLevels.includes(nextLevel.id)) {
                         completedLevels.push(nextLevel.id);
                         localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
                     }
-                    // Обновляем меню, чтобы отразить доступность
                     if (data.length) buildMenu(data);
                     hideStaticPage();
                     startLevelSequence(nextLevel.id);
                 } else {
                     advanceToNextBlock();
-                }
-            } else {
-                // Блок не найден – всё равно пытаемся продолжить
-                advanceToNextBlock();
-            }
+                }   // конец if (nextLevel)
+            }   // конец if (block)  ← добавлена недостающая скобка
         }, 2000);
-    };
+    }; 
 
     // Показываем туториал, если есть, потом запускаем подзадачи
     if (activeTutorialContent) {
