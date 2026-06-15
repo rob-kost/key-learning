@@ -155,9 +155,13 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /opt/keylearning/frontend && npm install"
 
-      - name: Start services
+      - name: Start backend service
         run: |
-          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl start keylearning-backend keylearning-frontend"
+          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl start keylearning-backend"
+
+      - name: Start frontend service
+        run: |
+          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl start keylearning-frontend"
 
       - name: Verify services are running (best effort)
         run: |
