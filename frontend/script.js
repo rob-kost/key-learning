@@ -630,9 +630,11 @@ window.advanceToNextBlock=function() {
 	currentLevelId = levelId;
 restartBtn.style.display = 'flex'; // показать кнопку
 if (skipBtn1) skipBtn1.style.display = 'flex';
-    const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
-	
-    if (block) currentBlockIndex = blocksData.indexOf(block);
+        const data = window.blocksData || blocksData;
+    const block = data.find(b => b.levels.some(l => l.id === levelId));
+    if (block) {
+        window.currentBlockIndex = data.indexOf(block);
+    }
 
     display.textContent = 'Загрузка...';
     display.style.color = '#aaa';
