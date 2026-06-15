@@ -22,9 +22,20 @@ import su.itgalley.database.seed.InputBlock
 import su.itgalley.database.seed.convertBlocksToSeedData
 import java.io.File
 import java.util.Properties
+import org.flywaydb.core.Flyway
 
 fun main() {
     val config = loadDatabaseConfig()
+
+// Применяем миграции перед инициализацией схемы
+    Flyway
+        .configure()
+        .dataSource(config.url, config.username, config.password)
+        .locations("classpath:db/migrations")
+        .baselineOnMigrate(true)
+        .load()
+        .migrate()
+
     DatabaseConfig.init(config, validateSchema = true)
 
     val daoRegistry = createDaoRegistry()
