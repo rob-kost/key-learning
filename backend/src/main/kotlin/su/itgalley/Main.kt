@@ -37,18 +37,24 @@ fun main() {
 }
 
 private fun loadDatabaseConfig(): DbConfig {
-    val properties =
-        Properties().apply {
-            val propFile = File("app.properties")
-            if (!propFile.exists()) error("app.properties not found")
-            load(propFile.reader())
-        }
+    // Лениво загружаем файл, только если он существует и нужен
+    fun loadFromFileOrNull(): Properties? {
+        val file = File("app.properties")
+        if (!file.exists()) return null
+        return Properties().apply { load(file.reader()) }
+    }
 
-    val dbHost = properties.getProperty("db.host", "localhost")
-    val dbPort = properties.getProperty("db.port", "3306")
-    val dbName = properties.getProperty("db.base", "keyldb")
-    val dbUser = properties.getProperty("db.user") ?: error("Missing db.user in app.properties")
-    val dbPassword = properties.getProperty("db.password") ?: error("Missing db.password in app.properties")
+    // Пытаемся получить значение: сначала из переменной окружения, потом из файла
+    fun getValue(envVar: String, propertyKey: String, default: String? = null): String {
+        return System.getenv(envVar) ?: loadFromFileOrNull()?.getProperty(propertyKey) ?: default
+        ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
+    }
+
+    val dbHost = getValue("DB_HOST", "db.host", "localhost")
+    val dbPort = getValue("DB_PORT", "db.port", "3306")
+    val dbName = getValue("DB_NAME", "db.base", "keyldb")
+    val dbUser = getValue("DB_USER", "db.user") // обязательно
+    val dbPassword = getValue("DB_PASSWORD", "db.password") // обязательно
 
     return DbConfig(
         url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
