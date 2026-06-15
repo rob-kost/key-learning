@@ -32,7 +32,7 @@ document.getElementById('staticPage').addEventListener('click', (e) => {
     const blockLink = e.target.closest('[data-block-id]');
     if (!blockLink) return;
     const blockId = blockLink.getAttribute('data-block-id');
-    const block = blocksData.find(b => b.id === blockId);
+    const block = (window.blocksData || blocksData).find(b => b.id === blockId);
     if (block) showBlockPage(block);
 });
 
@@ -68,34 +68,38 @@ if(skipBtn1){
 
 skipBtn1.addEventListener('click', () => {
     if (!currentLevelId) return;
-    if (!completedLevels.includes(currentLevelId)) {
-        completedLevels.push(currentLevelId);
-        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+    if (!window.completedLevels.includes(currentLevelId)) {
+        window.completedLevels.push(currentLevelId);
+        localStorage.setItem('completedLevels', JSON.stringify(window.completedLevels));
     }
     clearProgress();
-    // Переход к следующему уровню (как в конце startLevelSequence)
-    const block = blocksData.find(b => b.levels.some(l => l.id === currentLevelId));
-    if (block) {
-        const currentLevelIndex = block.levels.findIndex(l => l.id === currentLevelId);
-        const nextLevel = block.levels[currentLevelIndex + 1];
-        if (nextLevel) {
-            hideStaticPage();
-            startLevelSequence(nextLevel.id);
-        } else {
-            advanceToNextBlock();
+    const data = window.blocksData || blocksData;
+    const block = data.find(b => b.levels.some(l => l.id === currentLevelId));
+    if (!block) return;
+    const currentLevelIndex = block.levels.findIndex(l => l.id === currentLevelId);
+    const nextLevel = block.levels[currentLevelIndex + 1];
+    if (nextLevel) {
+        if (!window.completedLevels.includes(nextLevel.id)) {
+            window.completedLevels.push(nextLevel.id);
+            localStorage.setItem('completedLevels', JSON.stringify(window.completedLevels));
         }
+        if (data.length) buildMenu(data);
+        hideStaticPage();
+        startLevelSequence(nextLevel.id);
+    } else {
+        advanceToNextBlock();
     }
 });
 }
 
 window.renderHomePage=function() {
-    const blockListHTML = window.blocksData.length
-        ? window.blocksData.map((b, i) =>
-            `<h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;">${i+1}. ${b.name}</h3>`
-        ).join('')
+	const data = window.blocksData || [];
+
+     const blockListHTML = data.length
+       ? data.map((b, i) => `<h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;">${i+1}. ${b.name}</h3>`).join('')
         : '<p style="color:#aaa;">Нет доступных блоков</p>';
 
-    const firstBlock = window.blocksData[0] || null;
+    const firstBlock = data[0] || null;
 
     const html = marked.parse(HOME_PRE_MD) +
         (firstBlock ? `<button id="startLearningBtn" class="block-start-btn">Начать обучение</button>` : '') +
@@ -116,13 +120,17 @@ window.renderHomePage=function() {
 }
 
 
-window.getLevelName=function(levelId) {
-    for (const block of blocksData) {
+window.getLevelName = function(levelId) {
+    // используем глобальный массив, чтобы гарантировать актуальность
+    const data = window.blocksData || blocksData;
+    if (!data) return levelId;   // защита от вызова до загрузки
+    for (const block of (window.blocksData || blocksData)) {
         const level = block.levels.find(l => l.id === levelId);
         if (level) return level.name;
     }
-    return levelId; // fallback на ID, если имя не найдено
-}
+    console.warn('Уровень с id ' + levelId + ' не найден в блоках');
+    return levelId;   // fallback – покажет UUID, но вы увидите предупреждение
+};
 
     let currentBlockIndex = 0;
 window.currentBlockIndex = currentBlockIndex;
@@ -182,9 +190,8 @@ const HOME_POST_MD = `---
 - Самый сексуальный мужик в мире: Косточкин Сергей - ИВТ-31
 - Злодей британец: Быстров Егор - ИВТ-32
 - Так себе шутник: Грачёв Артём - ИВТ-31
-- Пубертатная язва: Кондратьев Никита - ИВТ-31
 - Какой-то мужик: Мясников Юрий - ИВТ-31
-- Недопонятый гений: Шабурин Константин - ИВТ-31
+- Недопонятые гении: Шабурин Константин, Кондратьев Никита - ИВТ-31
 
 ---
 Проект создан в рамках курса Программная инженерия.
@@ -480,6 +487,7 @@ window.isLevelAvailable = function(blocks, blockIndex, levelIndex, block) {
 };
 
 window.buildMenu=function(blocks) {
+	window.blocksData = blocks;
         const menuRoot = document.getElementById('menuRoot');
         if (!menuRoot) return;
 
@@ -545,7 +553,7 @@ if (levelItem && !toggle) {
             // Клик по блоку
             if (menuItem && !menuItem.classList.contains('home-item') && menuItem.hasAttribute('data-block-id')) {
                 const blockId = menuItem.getAttribute('data-block-id');
-                const block = blocksData.find(b => b.id === blockId);
+                const block = window.blocksData ? (window.blocksData || blocksData).find(b => b.id === blockId) : null;
                 if (block) showBlockPage(block);
                 return;
             }
@@ -622,9 +630,11 @@ window.advanceToNextBlock=function() {
 	currentLevelId = levelId;
 restartBtn.style.display = 'flex'; // показать кнопку
 if (skipBtn1) skipBtn1.style.display = 'flex';
-    const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
-	currentLevelName = getLevelName(levelId);
-    if (block) currentBlockIndex = blocksData.indexOf(block);
+        const data = window.blocksData || blocksData;
+    const block = data.find(b => b.levels.some(l => l.id === levelId));
+    if (block) {
+        window.currentBlockIndex = data.indexOf(block);
+    }
 
     display.textContent = 'Загрузка...';
     display.style.color = '#aaa';
@@ -637,6 +647,7 @@ if (skipBtn1) skipBtn1.style.display = 'flex';
         showNotification('Ошибка загрузки уровня');
         return;
     }
+currentLevelName = getLevelName(levelId);
 activeHelpContent = levelData.help || null;
 
     const subtasks = levelData.subtasks || [];
@@ -684,22 +695,26 @@ taskTextEl.textContent = '';
 nextTaskElements.forEach(el => el.textContent = '');
 
         // Через 2 секунды переходим к следующему уровню или блоку
-        setTimeout(() => {
-            const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
+                setTimeout(() => {
+            // Используем глобальный массив для надёжности
+            const data = window.blocksData || blocksData;
+            const block = data.find(b => b.levels.some(l => l.id === levelId));
             if (block) {
-                const currentLevelIndex = block.levels.findIndex(l => l.id === levelId);
-                const nextLevel = block.levels[currentLevelIndex + 1];
+                const nextLevel = block.levels[block.levels.findIndex(l => l.id === levelId) + 1];
                 if (nextLevel) {
-                    // Запускаем следующий уровень этого же блока
-			hideStaticPage(); 
+                    if (!completedLevels.includes(nextLevel.id)) {
+                        completedLevels.push(nextLevel.id);
+                        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+                    }
+                    if (data.length) buildMenu(data);
+                    hideStaticPage();
                     startLevelSequence(nextLevel.id);
                 } else {
-                    // Все уровни блока пройдены — переходим к следующему блоку
                     advanceToNextBlock();
-                }
-            }
+                }   // конец if (nextLevel)
+            }   // конец if (block)  ← добавлена недостающая скобка
         }, 2000);
-    };
+    }; 
 
     // Показываем туториал, если есть, потом запускаем подзадачи
     if (activeTutorialContent) {
@@ -784,9 +799,14 @@ window.startHKLevel=function(taskData) {
             display.style.color = '';
 
             const steps = [...taskData.combination];
-	const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key)) ||
-    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'W')) ||
-    (steps.some(step => step.key === 'Ctrl') && steps.some(step => step.key === 'T'));
+	const isCtrlKey = (key) => key === 'Ctrl' || key === 'Control';
+const isShiftKey = (key) => key === 'Shift';
+const isEscKey = (key) => key === 'Esc' || key === 'Escape';
+
+const sequentialMode = steps.some(step => UNTRACKED_KEYS.includes(step.key)) ||
+    (steps.some(step => isCtrlKey(step.key)) && steps.some(step => step.key === 'W' || step.key === 'w')) ||
+    (steps.some(step => isCtrlKey(step.key)) && steps.some(step => step.key === 'T' || step.key === 't')) ||
+    (steps.some(step => isCtrlKey(step.key)) && steps.some(step => isShiftKey(step.key)) && steps.some(step => isEscKey(step.key)));
 	if (sequentialMode) {
     taskTextEl.textContent += ' (вводите клавиши по одной)';
 }

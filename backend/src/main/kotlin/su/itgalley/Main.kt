@@ -112,7 +112,7 @@ private fun convertAndGenerateSeedData() {
     val simpleJson = json.decodeFromString<List<InputBlock>>(jsonString)
     val seedData = convertBlocksToSeedData(simpleJson)
 
-    val outputDir = File("src/main/resources/")
+    val outputDir = File("src/main/resources")
     outputDir.mkdirs()
     val outputFile = File(outputDir, "seed_data.json")
     outputFile.writeText(json.encodeToString(seedData))

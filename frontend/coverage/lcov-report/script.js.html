@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.55% </span>
+                <span class="strong">56.6% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>423/748</span>
+                <span class='fraction'>424/749</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">51.14% </span>
+                <span class="strong">50.67% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>224/438</span>
+                <span class='fraction'>225/444</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.53% </span>
+                <span class="strong">57.6% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>374/650</span>
+                <span class='fraction'>375/651</span>
             </div>
         
             
@@ -1248,7 +1248,8 @@
 <a name='L1183'></a><a href='#L1183'>1183</a>
 <a name='L1184'></a><a href='#L1184'>1184</a>
 <a name='L1185'></a><a href='#L1185'>1185</a>
-<a name='L1186'></a><a href='#L1186'>1186</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L1186'></a><a href='#L1186'>1186</a>
+<a name='L1187'></a><a href='#L1187'>1187</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1341,8 +1342,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -1873,7 +1874,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1887,6 +1888,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1991,19 +1993,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2524,13 +2526,13 @@ const skipBtn1 = document.getElementById('skipLevelBtn');
 }
 &nbsp;
 window.renderHomePage=function() {
-    const blockListHTML = window.blocksData.length
-        ? window.blocksData.map((b, i) =&gt;
-            `&lt;h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;"&gt;${i+1}. ${b.name}&lt;/h3&gt;`
-        ).join('')
+	const data = window.blocksData || <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
+&nbsp;
+     const blockListHTML = data.length
+       ? data.map((b, i) =&gt; `&lt;h3 data-block-id="${b.id}" style="cursor:pointer; color:#81b4e3;"&gt;${i+1}. ${b.name}&lt;/h3&gt;`).join('')
         : '&lt;p style="color:#aaa;"&gt;Нет доступных блоков&lt;/p&gt;';
 &nbsp;
-    const firstBlock = window.blocksData[0] || null;
+    const firstBlock = data[0] || null;
 &nbsp;
     const html = marked.parse(HOME_PRE_MD) +
         (firstBlock ? `&lt;button id="startLearningBtn" class="block-start-btn"&gt;Начать обучение&lt;/button&gt;` : '') +
@@ -2980,7 +2982,7 @@ window.buildMenu=function(blocks) {
             // Клик по блоку
 <span class="cstat-no" title="statement not covered" >            if (menuItem &amp;&amp; !menuItem.classList.contains('home-item') &amp;&amp; menuItem.hasAttribute('data-block-id')) {</span>
                 const blockId = <span class="cstat-no" title="statement not covered" >menuItem.getAttribute('data-block-id');</span>
-                const block = <span class="cstat-no" title="statement not covered" >blocksData.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === blockId)</span>;</span>
+                const block = <span class="cstat-no" title="statement not covered" >window.blocksData ? window.blocksData.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === blockId)</span> : null;</span>
 <span class="cstat-no" title="statement not covered" >                if (block) <span class="cstat-no" title="statement not covered" >showBlockPage(block);</span></span>
 <span class="cstat-no" title="statement not covered" >                return;</span>
             }
@@ -3058,7 +3060,7 @@ window.advanceToNextBlock=function() {
 <span class="cstat-no" title="statement not covered" >restartBtn.style.display = 'flex'; </span>// показать кнопку
 <span class="cstat-no" title="statement not covered" >if (skipBtn1) <span class="cstat-no" title="statement not covered" >skipBtn1.style.display = 'flex';</span></span>
     const block = <span class="cstat-no" title="statement not covered" >blocksData.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.levels.some(<span class="fstat-no" title="function not covered" >l </span>=&gt; <span class="cstat-no" title="statement not covered" >l.id === levelId)</span>)</span>;</span>
-<span class="cstat-no" title="statement not covered" >	currentLevelName = getLevelName(levelId);</span>
+	
 <span class="cstat-no" title="statement not covered" >    if (block) <span class="cstat-no" title="statement not covered" >currentBlockIndex = blocksData.indexOf(block);</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    display.textContent = 'Загрузка...';</span>
@@ -3072,6 +3074,7 @@ window.advanceToNextBlock=function() {
 <span class="cstat-no" title="statement not covered" >        showNotification('Ошибка загрузки уровня');</span>
 <span class="cstat-no" title="statement not covered" >        return;</span>
     }
+<span class="cstat-no" title="statement not covered" >currentLevelName = getLevelName(levelId);</span>
 <span class="cstat-no" title="statement not covered" >activeHelpContent = levelData.help || null;</span>
 &nbsp;
     const subtasks = <span class="cstat-no" title="statement not covered" >levelData.subtasks || [];</span>
@@ -3120,7 +3123,7 @@ const levelName = <span class="cstat-no" title="statement not covered" >getLevel
 &nbsp;
         // Через 2 секунды переходим к следующему уровню или блоку
 <span class="cstat-no" title="statement not covered" >        setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-            const block = <span class="cstat-no" title="statement not covered" >blocksData.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.levels.some(<span class="fstat-no" title="function not covered" >l </span>=&gt; <span class="cstat-no" title="statement not covered" >l.id === levelId)</span>)</span>;</span>
+            const block = <span class="cstat-no" title="statement not covered" >window.blocksData ? window.blocksData.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.levels.some(<span class="fstat-no" title="function not covered" >l </span>=&gt; <span class="cstat-no" title="statement not covered" >l.id === levelId)</span>)</span> : null;</span>
 <span class="cstat-no" title="statement not covered" >            if (block) {</span>
                 const currentLevelIndex = <span class="cstat-no" title="statement not covered" >block.levels.findIndex(<span class="fstat-no" title="function not covered" >l </span>=&gt; <span class="cstat-no" title="statement not covered" >l.id === levelId)</span>;</span>
                 const nextLevel = <span class="cstat-no" title="statement not covered" >block.levels[currentLevelIndex + 1];</span>
@@ -3625,7 +3628,7 @@ setTimeout(() =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-15T19:00:16.892Z
+                at 2026-06-15T19:24:57.234Z
             </div>
         <script src="prettify.js"></script>
         <script>

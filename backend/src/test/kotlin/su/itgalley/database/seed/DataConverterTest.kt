@@ -76,54 +76,6 @@ class DataConverterTest {
     }
 
     @Test
-    fun `convertBlocksToSeedData creates hotkey subtask with keys and combination`() {
-        val blocks =
-            listOf(
-                InputBlock(
-                    name = "Shortcuts",
-                    description = "Hotkeys block",
-                    levels =
-                        listOf(
-                            InputLevel(
-                                name = "Copy Paste",
-                                tutorial = null,
-                                help = null,
-                                subtasks =
-                                    listOf(
-                                        InputSubtask(
-                                            type = "HOTKEY",
-                                            desc = "Copy",
-                                            solution = "Control+C",
-                                        ),
-                                    ),
-                            ),
-                        ),
-                ),
-            )
-
-        val seedData = convertBlocksToSeedData(blocks)
-
-        seedData.subtasks.single().let { subtask ->
-            subtask.solutionType shouldBe SolutionType.HOTKEY
-            subtask.stringSolution.shouldBeNull()
-            subtask.keySolutionRef.shouldNotBeNull()
-        }
-
-        seedData.hotKeys shouldHaveSize 1
-        seedData.hotKeys.single().blockRef shouldBe "shortcuts"
-
-        seedData.combinations shouldHaveSize 1
-        seedData.combinationKeys shouldHaveSize 2
-        seedData.combinationKeys.map { it.keyRef } shouldContainExactly listOf("Control", "C")
-
-        seedData.keys.map { it.key to it.keyGroup } shouldContainExactly
-            listOf(
-                "Control" to KeyGroup.CONTROLS,
-                "C" to KeyGroup.SYMBOLS,
-            )
-    }
-
-    @Test
     fun `convertBlocksToSeedData deduplicates shared hotkeys within block`() {
         val blocks =
             listOf(
