@@ -139,8 +139,8 @@ const HUMAN_TO_SYSTEM = {
     'Esc': 'Escape',
     'Enter': 'Enter',
     'Tab': 'Tab',
+    'Space': ' '
     'Backspace': 'Backspace',
-    'Space': ' ',
     '↑': 'ArrowUp',
     '↓': 'ArrowDown',
     '←': 'ArrowLeft',
@@ -540,6 +540,7 @@ if (menuItem && menuItem.classList.contains('home-item')) {
     fetchNavigationData()
     .then(blocks => {
         blocksData = blocks;
+	window.blocksData = blocksData;
         buildMenu(blocks);
         const saved = loadProgress();
         if (saved && saved.levelId) {
@@ -594,6 +595,7 @@ window.advanceToNextBlock=function() {
 restartBtn.style.display = 'flex'; // показать кнопку
 if (skipBtn1) skipBtn1.style.display = 'flex';
     const block = blocksData.find(b => b.levels.some(l => l.id === levelId));
+	currentLevelName = getLevelName(levelId);
     if (block) currentBlockIndex = blocksData.indexOf(block);
 
     display.textContent = 'Загрузка...';
@@ -641,7 +643,11 @@ if (skipBtn1) skipBtn1.style.display = 'none';
     completedLevels.push(levelId);
     localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
 }
-        const levelName = getLevelName(levelId);
+// Обновить меню, чтобы отразить доступность уровней
+if (window.blocksData && window.blocksData.length) {
+    buildMenu(window.blocksData);
+}
+
 	currentLevelName = levelName;
         display.textContent = `Уровень "${levelName}" пройден!`;
         adjustFontSize(display);
@@ -824,11 +830,12 @@ if (sequentialMode) {
     if (rawKey === ' ') rawKey = ' ';
     lastErrorKey = SYSTEM_TO_HUMAN[rawKey] || rawKey;
 
-    if (id === expectedId) {
+        if (id === expectedId) {
+        error = false;
+        lastErrorKey = null;
         currentStep++;
         if (currentStep === steps.length) {
             finished = true;
-
             if (hkKeyDownHandler) document.removeEventListener('keydown', hkKeyDownHandler);
             if (hkKeyUpHandler) document.removeEventListener('keyup', hkKeyUpHandler);
             hkKeyDownHandler = null;
@@ -837,11 +844,10 @@ if (sequentialMode) {
                 activeTutorialContent = null;
                 resolve();
             }, 1000);
-        } else {
-            lastErrorKey = null;
         }
+    } else {
+        error = true;
     }
-    // ошибка: lastErrorKey уже установлен
     render();
     return;
 }
