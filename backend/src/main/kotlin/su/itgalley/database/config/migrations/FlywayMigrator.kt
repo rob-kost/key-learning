@@ -30,7 +30,7 @@ private fun loadConfig(): Pair<DbConfig, String> {
     fun getValue(
         envVar: String,
         propertyKey: String,
-        default: String? = null
+        default: String? = null,
     ): String {
         return System.getenv(envVar)
             ?: loadFromFileOrNull()?.getProperty(propertyKey)
@@ -44,11 +44,12 @@ private fun loadConfig(): Pair<DbConfig, String> {
     val dbUser = getValue("DB_USER", "db.user") // обязательно
     val dbPassword = getValue("DB_PASSWORD", "db.password") // обязательно
 
-    val dbConfig = DbConfig(
-        url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
-        username = dbUser,
-        password = dbPassword,
-    )
+    val dbConfig =
+        DbConfig(
+            url = "jdbc:mariadb://$dbHost:$dbPort/$dbName",
+            username = dbUser,
+            password = dbPassword,
+        )
     return dbConfig to dbName
 }
 
