@@ -128,6 +128,10 @@ private fun convertAndGenerateSeedData() {
     val outputFile = File(outputDir, "seed_data.json")
     outputFile.writeText(json.encodeToString(seedData))
 
+    val buildFile = File("build/resources/main/seed_data.json")
+    buildFile.parentFile.mkdirs()
+    buildFile.writeText(json.encodeToString(seedData))
+
     println("Conversion completed. seed_data.json file created")
 }
 
