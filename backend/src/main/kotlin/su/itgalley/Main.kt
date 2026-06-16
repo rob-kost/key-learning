@@ -107,6 +107,7 @@ private fun createDaoRegistry(): DaoRegistry {
     )
 }
 
+@Suppress("UnusedPrivateMember")
 private fun convertAndGenerateSeedData() {
     val classLoader = ClassLoader.getSystemClassLoader()
     val inputStream =
