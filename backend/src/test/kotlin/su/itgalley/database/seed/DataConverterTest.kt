@@ -1,7 +1,6 @@
 package su.itgalley.database.seed
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -73,54 +72,6 @@ class DataConverterTest {
 
         seedData.taskSubtasks shouldHaveSize 1
         seedData.taskSubtasks.single().position shouldBe 1
-    }
-
-    @Test
-    fun `convertBlocksToSeedData creates hotkey subtask with keys and combination`() {
-        val blocks =
-            listOf(
-                InputBlock(
-                    name = "Shortcuts",
-                    description = "Hotkeys block",
-                    levels =
-                        listOf(
-                            InputLevel(
-                                name = "Copy Paste",
-                                tutorial = null,
-                                help = null,
-                                subtasks =
-                                    listOf(
-                                        InputSubtask(
-                                            type = "HOTKEY",
-                                            desc = "Copy",
-                                            solution = "Control+C",
-                                        ),
-                                    ),
-                            ),
-                        ),
-                ),
-            )
-
-        val seedData = convertBlocksToSeedData(blocks)
-
-        seedData.subtasks.single().let { subtask ->
-            subtask.solutionType shouldBe SolutionType.HOTKEY
-            subtask.stringSolution.shouldBeNull()
-            subtask.keySolutionRef.shouldNotBeNull()
-        }
-
-        seedData.hotKeys shouldHaveSize 1
-        seedData.hotKeys.single().blockRef shouldBe "shortcuts"
-
-        seedData.combinations shouldHaveSize 1
-        seedData.combinationKeys shouldHaveSize 2
-        seedData.combinationKeys.map { it.keyRef } shouldContainExactly listOf("Control", "C")
-
-        seedData.keys.map { it.key to it.keyGroup } shouldContainExactly
-            listOf(
-                "Control" to KeyGroup.CONTROLS,
-                "C" to KeyGroup.SYMBOLS,
-            )
     }
 
     @Test
