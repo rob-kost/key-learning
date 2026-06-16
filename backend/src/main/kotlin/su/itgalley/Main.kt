@@ -39,7 +39,7 @@ fun main() {
     DatabaseConfig.init(config, validateSchema = true)
 
     val daoRegistry = createDaoRegistry()
-    convertAndGenerateSeedData()
+    // convertAndGenerateSeedData()
 
     val seeder = DatabaseSeeder(daoRegistry)
     seeder.seed()
