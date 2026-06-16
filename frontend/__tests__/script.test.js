@@ -44,9 +44,9 @@ describe('displayKey', () => {
     test('переводит Meta в Win', () => {
         expect(window.displayKey('Meta')).toBe('Win');
     });
-    test('пробел или Space даёт "Пробел"', () => {
-        expect(window.displayKey(' ')).toBe('Пробел');
-        expect(window.displayKey('Space')).toBe('Пробел');
+    test('пробел или Space даёт "Space"', () => {
+        expect(window.displayKey(' ')).toBe('Space');
+        expect(window.displayKey('Space')).toBe('Space');
     });
     test('обычная буква возвращается как есть', () => {
         expect(window.displayKey('A')).toBe('A');
@@ -103,9 +103,6 @@ describe('getExpectedIdentifier', () => {
     test('человеческое имя Win преобразуется в Meta', () => {
         expect(window.getExpectedIdentifier('Win')).toBe('Meta');
     });
-    test('человеческое имя Esc преобразуется в Escape', () => {
-        expect(window.getExpectedIdentifier('Esc')).toBe('Escape');
-    });
 });
 
 // ========== getTaskDisplayDescription ==========
@@ -153,11 +150,13 @@ describe('isLevelAvailable', () => {
     test('первый уровень первого блока всегда доступен', () => {
         expect(window.isLevelAvailable(blocks, 0, 0, blocks[0])).toBe(true);
     });
-    test('второй уровень недоступен, если не пройден первый', () => {
-        expect(window.isLevelAvailable(blocks, 0, 1, blocks[0])).toBe(false);
-        window.completedLevels.push('1001');
-        expect(window.isLevelAvailable(blocks, 0, 1, blocks[0])).toBe(true);
-    });
+    test('второй уровень нулевого блока всегда доступен', () => {
+    // Нулевой блок открыт полностью – второй уровень должен быть доступен сразу
+    expect(window.isLevelAvailable(blocks, 0, 1, blocks[0])).toBe(true);
+    // Даже при отсутствии прогресса он доступен
+    window.completedLevels = [];
+    expect(window.isLevelAvailable(blocks, 0, 1, blocks[0])).toBe(true);
+});
     test('первый уровень второго блока недоступен, если не пройдены все уровни первого блока', () => {
         window.completedLevels = ['1001'];
         expect(window.isLevelAvailable(blocks, 1, 0, blocks[1])).toBe(false);

@@ -1,7 +1,6 @@
 package su.itgalley
 
 import kotlinx.serialization.json.Json
-import org.flywaydb.core.Flyway
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import su.itgalley.database.config.DatabaseConfig
@@ -26,20 +25,10 @@ import java.util.Properties
 
 fun main() {
     val config = loadDatabaseConfig()
-
-// Применяем миграции перед инициализацией схемы
-    Flyway
-        .configure()
-        .dataSource(config.url, config.username, config.password)
-        .locations("classpath:db/migrations")
-        .baselineOnMigrate(true)
-        .load()
-        .migrate()
-
     DatabaseConfig.init(config, validateSchema = true)
 
     val daoRegistry = createDaoRegistry()
-    // convertAndGenerateSeedData()
+    convertAndGenerateSeedData()
 
     val seeder = DatabaseSeeder(daoRegistry)
     seeder.seed()
@@ -107,12 +96,11 @@ private fun createDaoRegistry(): DaoRegistry {
     )
 }
 
-@Suppress("UnusedPrivateMember")
 private fun convertAndGenerateSeedData() {
     val classLoader = ClassLoader.getSystemClassLoader()
     val inputStream =
-        classLoader.getResourceAsStream("KeyLearningBlock1.json")
-            ?: error("KeyLearningBlock1.json not found in classpath")
+        classLoader.getResourceAsStream("KeyLearning_content.json")
+            ?: error("KeyLearning_content.json not found in classpath")
 
     val json =
         Json {
@@ -124,11 +112,12 @@ private fun convertAndGenerateSeedData() {
     val simpleJson = json.decodeFromString<List<InputBlock>>(jsonString)
     val seedData = convertBlocksToSeedData(simpleJson)
 
-    val outputDir = File("src/main/resources/")
+    val outputDir = File("src/main/resources")
     outputDir.mkdirs()
     val outputFile = File(outputDir, "seed_data.json")
     outputFile.writeText(json.encodeToString(seedData))
 
+    // Копируем в build, чтобы classloader нашёл
     val buildFile = File("build/resources/main/seed_data.json")
     buildFile.parentFile.mkdirs()
     buildFile.writeText(json.encodeToString(seedData))
