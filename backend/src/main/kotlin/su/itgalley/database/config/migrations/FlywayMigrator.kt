@@ -9,7 +9,6 @@ import java.sql.SQLException
 import java.util.Properties
 import kotlin.system.exitProcess
 
-private const val EXIT_MISSING_CREDENTIALS = 2
 private const val EXIT_FLYWAY_FAILURE = 3
 
 fun main(args: Array<String>) {
@@ -21,28 +20,28 @@ fun main(args: Array<String>) {
 }
 
 private fun loadConfig(): Pair<DbConfig, String> {
-    val appProperties =
-        Properties()
-            .apply {
-                val propertiesFile = File("app.properties")
-                if (propertiesFile.exists()) {
-                    load(propertiesFile.reader())
-                }
-            }
-
-    val dbHost = appProperties.getProperty("db.host") ?: "localhost"
-    val dbPort = appProperties.getProperty("db.port") ?: "3306"
-    val dbName = appProperties.getProperty("db.base") ?: "db"
-
-    // пользователь и пароль без дефолтных значений
-    val dbUser: String? = appProperties.getProperty("db.user")
-    val dbPassword: String? = appProperties.getProperty("db.password")
-
-    if (dbUser == null || dbPassword == null) {
-        println("ERROR: Missing database credentials")
-        println("Add your password and username to file")
-        exitProcess(EXIT_MISSING_CREDENTIALS)
+    fun loadFromFileOrNull(): Properties? {
+        val file = File("app.properties")
+        if (!file.exists()) return null
+        return Properties().apply { load(file.reader()) }
     }
+
+    fun getValue(
+        envVar: String,
+        propertyKey: String,
+        default: String? = null,
+    ): String {
+        return System.getenv(envVar)
+            ?: loadFromFileOrNull()?.getProperty(propertyKey)
+            ?: default
+            ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
+    }
+
+    val dbHost = getValue("DB_HOST", "db.host", "localhost")
+    val dbPort = getValue("DB_PORT", "db.port", "3306")
+    val dbName = getValue("DB_NAME", "db.base", "keyldb")
+    val dbUser = getValue("DB_USER", "db.user") // обязательно
+    val dbPassword = getValue("DB_PASSWORD", "db.password") // обязательно
 
     val dbConfig =
         DbConfig(
@@ -50,7 +49,6 @@ private fun loadConfig(): Pair<DbConfig, String> {
             username = dbUser,
             password = dbPassword,
         )
-
     return dbConfig to dbName
 }
 
@@ -91,25 +89,21 @@ private fun executeCommand(
         when (command) {
             "migrate" -> {
                 val result = flyway.migrate()
-                // выводит количество применённых миграций
                 println("Successfully applied ${result.migrationsExecuted} migrations")
             }
 
             "info" -> {
                 val info = flyway.info()
-                // выводит текущую миграцию в бд и количество миграций, которые ожидают применения
                 println("Current version: ${info.current()?.version ?: "Empty"}")
                 println("Pending: ${info.pending().size}")
             }
 
             "repair" -> {
-                // выполняет синхронизацию
                 flyway.repair()
                 println("Schema history repaired (checksums aligned)")
             }
 
             "clean" -> {
-                // полностью очищает базу данных
                 print("DESTROY ALL DATA? Type 'YES' to confirm: ")
                 if (readlnOrNull() == "YES") {
                     flyway.clean()

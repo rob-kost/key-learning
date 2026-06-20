@@ -51,5 +51,3 @@ bin/
 ### files .properties ###
 *.properties
 !gradle/wrapper/gradle-wrapper.properties
-
-seed_data.json

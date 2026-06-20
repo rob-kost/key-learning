@@ -448,7 +448,7 @@ window.showBlockPage=function(block) {
     // ========== ЗАГРУЗКА НАВИГАЦИИ ==========
     async function fetchNavigationData() {
     try {
-        const response = await fetch('http://localhost:8228/api/navigation');
+        const response = await fetch('/api/navigation');
         if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -602,7 +602,7 @@ if (restartLevel) {
     display.style.color = '#aaa';
 
     try {
-        const response = await fetch(`http://localhost:8228/api/levels/${levelId}`);
+        const response = await fetch(`/api/levels/${levelId}`);
         if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
         const levelData = await response.json();
         return levelData;
