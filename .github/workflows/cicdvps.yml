@@ -85,7 +85,7 @@ jobs:
             frontend/**
             !frontend/node_modules/**
 
-    deploy:
+  deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
     needs: [backend, frontend]
