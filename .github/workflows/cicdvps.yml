@@ -173,10 +173,10 @@ jobs:
 
       - name: Copy frontend files to server
         run: |
-          tar czf frontend.tar.gz .
-          scp -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no frontend.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/frontend.tar.gz
+          tar czf /tmp/frontend.tar.gz .
+          scp -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no /tmp/frontend.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/frontend.tar.gz
           ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "tar xzf /tmp/frontend.tar.gz -C /opt/keylearning/frontend/ && rm /tmp/frontend.tar.gz"
-
+      
       - name: Install frontend dependencies on server
         run: |
           ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /opt/keylearning/frontend && npm install"
