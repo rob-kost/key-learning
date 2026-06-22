@@ -189,6 +189,35 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl start keylearning-frontend"
 
-      - name: Verify services are running (best effort)
+      - name: Verify systemd services status
         run: |
           ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "systemctl is-active keylearning-backend || echo 'Backend not active (maybe DB missing?)'; systemctl is-active keylearning-frontend || echo 'Frontend not active'"
+
+      - name: Verify deployment with HTTP healthcheck
+        run: |
+          sleep 5   # даём сервисам немного времени на старт
+          echo "Checking backend API..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://key-learning.ru/api/navigation || echo "000")
+          if [ "$STATUS" != "200" ]; then
+            echo "Backend healthcheck FAILED (HTTP $STATUS)"
+            exit 1
+          fi
+          echo "Backend API OK (HTTP 200)"
+          
+          echo "Checking frontend..."
+          FRONT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://key-learning.ru/ || echo "000")
+          if [ "$FRONT_STATUS" != "200" ]; then
+            echo "Frontend healthcheck FAILED (HTTP $FRONT_STATUS)"
+            exit 1
+          fi
+          echo "Frontend OK (HTTP 200)"
+
+      - name: Report disk usage on server
+        if: always()
+        run: |
+          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "df -h / | awk 'NR==2 {print \"Disk usage: \" \$5 \" (free: \" \$4 \")\"}'"
+
+      - name: Clean up CI leftovers on server
+        if: always()
+        run: |
+          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo rm -rf /tmp/backend* /tmp/frontend* /tmp/*.tar.gz /tmp/*.zip"
