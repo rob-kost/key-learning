@@ -135,7 +135,6 @@ jobs:
             cd /tmp
             unzip -o backend.zip -d backend-dist
 
-            # находим Unix-скрипт и копируем с фиксированным именем
             BIN_SCRIPT=$(find backend-dist -type f -path '*/bin/*' ! -name '*.bat' | head -1)
             if [ -z "$BIN_SCRIPT" ]; then
               echo "ERROR: start script not found" >&2
@@ -144,7 +143,6 @@ jobs:
             cp "$BIN_SCRIPT" /opt/keylearning/backend/bin/key-learning-backend
             chmod +x /opt/keylearning/backend/bin/key-learning-backend
 
-            # синхронизируем библиотеки с удалением старых
             rsync -av --delete backend-dist/*/lib/ /opt/keylearning/backend/lib/
           REMOTE
 
@@ -195,7 +193,7 @@ jobs:
 
       - name: Verify deployment with HTTP healthcheck
         run: |
-          sleep 5   # даём сервисам немного времени на старт
+          sleep 5   
           echo "Checking backend API..."
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://key-learning.ru/api/navigation || echo "000")
           if [ "$STATUS" != "200" ]; then
