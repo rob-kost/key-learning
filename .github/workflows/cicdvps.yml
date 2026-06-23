@@ -197,7 +197,7 @@ jobs:
         run: |
           sleep 5   # даём сервисам немного времени на старт
           echo "Checking backend API..."
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://key-learning.ru/api/navigation || echo "000")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://key-learning.ru/api/navigation || echo "000")
           if [ "$STATUS" != "200" ]; then
             echo "Backend healthcheck FAILED (HTTP $STATUS)"
             exit 1
@@ -205,7 +205,7 @@ jobs:
           echo "Backend API OK (HTTP 200)"
           
           echo "Checking frontend..."
-          FRONT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://key-learning.ru/ || echo "000")
+          FRONT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://key-learning.ru/ || echo "000")
           if [ "$FRONT_STATUS" != "200" ]; then
             echo "Frontend healthcheck FAILED (HTTP $FRONT_STATUS)"
             exit 1
@@ -216,8 +216,3 @@ jobs:
         if: always()
         run: |
           ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "df -h / | awk 'NR==2 {print \"Disk usage: \" \$5 \" (free: \" \$4 \")\"}'"
-
-      - name: Clean up CI leftovers on server
-        if: always()
-        run: |
-          ssh -i ~/.ssh/deploy-key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo rm -rf /tmp/backend* /tmp/frontend* /tmp/*.tar.gz /tmp/*.zip"
