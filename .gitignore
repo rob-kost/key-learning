@@ -1,27 +1,19 @@
 .gradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+seed_data.json
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea
+out/
 *.iws
 *.iml
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-.idea/dataSources.local.xml
-.idea/dataSources.xml
-.idea/dataSources/
-.idea/detekt.xml
-.idea
+
 ### Kotlin ###
 .kotlin
+
+### Local properties ###
+app.properties
 
 ### Eclipse ###
 .apt_generated
@@ -47,7 +39,3 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
-### files .properties ###
-*.properties
-!gradle/wrapper/gradle-wrapper.properties
