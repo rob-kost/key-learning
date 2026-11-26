@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
-// Указываем папку, где лежат index.html и остальное. '.' – это текущая папка.
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ index.html пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. '.' пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 const ROOT_DIR = path.join(__dirname, '.');
 
 const MIME = {
@@ -20,7 +20,7 @@ const MIME = {
 const server = http.createServer((req, res) => {
     let filePath = path.join(ROOT_DIR, req.url === '/' ? 'index.html' : req.url);
 
-    // Простейшие API-заглушки, чтобы fetch не ругался
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ API-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ fetch пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     if (req.url.startsWith('/api/')) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         if (req.url === '/api/navigation') {
@@ -41,10 +41,10 @@ const server = http.createServer((req, res) => {
         if (err) {
             if (err.code === 'ENOENT') {
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end('Файл не найден');
+                res.end('пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ');
             } else {
                 res.writeHead(500);
-                res.end('Ошибка сервера');
+                res.end('пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
             }
         } else {
             res.writeHead(200, { 'Content-Type': contentType });
@@ -54,5 +54,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Сервер запущен: http://localhost:${PORT}`);
+    console.log(`пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: http://localhost:${PORT}`);
 });
