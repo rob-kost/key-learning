@@ -240,16 +240,26 @@ jobs:
 
       - name: Healthcheck after deploy
         run: |
-          echo "Waiting 15 seconds for containers to start..."
-          sleep 15
+          echo "Waiting 45 seconds for JVM to start..."
+          sleep 45
 
           echo "Checking backend (port 8228)..."
-          BACKEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:8228/api/navigation || echo "000")
-          if [ "$BACKEND_STATUS" != "200" ]; then
-            echo "Backend healthcheck FAILED (HTTP $BACKEND_STATUS)"
+          BACKEND_OK=false
+          for i in 1 2 3 4 5; do
+            BACKEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:8228/api/navigation || echo "000")
+            if [ "$BACKEND_STATUS" = "200" ]; then
+              echo "Backend OK (HTTP 200) after attempt $i"
+              BACKEND_OK=true
+              break
+            fi
+            echo "Attempt $i: Backend returned HTTP $BACKEND_STATUS, retrying in 10s..."
+            sleep 10
+          done
+
+          if [ "$BACKEND_OK" = false ]; then
+            echo "Backend healthcheck FAILED after 5 attempts"
             exit 1
           fi
-          echo "Backend OK (HTTP 200)"
 
           echo "Checking frontend (port 3000)..."
           FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:3000/ || echo "000")
