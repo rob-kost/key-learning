@@ -57,6 +57,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: ghcr.io/rob-kost/key-learning/backend:latest
     container_name: keylearning-migrate
     # Переопределяем команду запуска: вместо основного приложения
     # запускаем класс FlywayMigratorKt с аргументом "migrate"
@@ -118,6 +119,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: ghcr.io/rob-kost/key-learning/frontend:latest
     container_name: keylearning-frontend
     restart: always
     ports:
