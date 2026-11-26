@@ -108,6 +108,18 @@ jobs:
         env:
           COMPOSE_PROJECT_NAME: keylearning
 
+      # Проверка: видим ли секретики?
+
+      - name: Debug secrets
+        run: |
+          echo "SSH_HOST length: ${#SSH_HOST}"
+          echo "SSH_USER length: ${#SSH_USER}"
+          echo "SSH_PRIVATE_KEY length: ${#SSH_PRIVATE_KEY}"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
       # Деплой на VPS
 
       - name: Deploy to VPS
