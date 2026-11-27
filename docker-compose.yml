@@ -1,0 +1,156 @@
+# ============================================================
+# DOCKER-COMPOSE.YML — Оркестрация всех сервисов проекта
+# ============================================================
+# Этот файл описывает четыре сервиса:
+# 1. db — база данных MariaDB
+# 2. backend-migrate — сервис миграций (применяет Flyway до старта бэкенда)
+# 3. backend — основное приложение Kotlin/http4k
+# 4. frontend — Node.js сервер для раздачи статики
+#
+# Запуск: docker compose up
+# Остановка: docker compose down
+# Логи: docker compose logs -f
+# ============================================================
+
+services:
+  # ============================================================
+  # СЕРВИС 1: БАЗА ДАННЫХ (MariaDB)
+  # ============================================================
+  db:
+    # Используем стабильный образ MariaDB 10.11 (LTS)
+    # Этот образ работает на Linux, поэтому проблемы GSSAPI не будет
+    image: mariadb:10.11
+    command: --lower-case-table-names=1
+    container_name: keylearning-db
+    restart: always
+    environment:
+      # Переменные окружения для инициализации MariaDB
+      # Они используются только при ПЕРВОМ запуске контейнера
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: keyldb
+      MARIADB_USER: user
+      MARIADB_PASSWORD: pass
+    ports:
+      # Пробрасываем порт 3306 на хост-машину (опционально, для отладки)
+      # Если не нужно — можно закомментировать эту строку
+      - "3306:3306"
+    volumes:
+      # Персистентное хранилище данных БД
+      # Данные сохраняются между перезапусками контейнера
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - keylearning-network
+    healthcheck:
+      # Проверка готовности БД
+      # Docker будет ждать, пока БД не станет доступной
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ============================================================
+  # СЕРВИС 2: МИГРАЦИИ БАЗЫ ДАННЫХ (Flyway)
+  # ============================================================
+  # Этот сервис запускается ПЕРЕД основным бэкендом и применяет миграции
+  # Он использует тот же образ, что и backend, но с другой командой запуска
+  backend-migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: ghcr.io/rob-kost/key-learning/backend:latest
+    container_name: keylearning-migrate
+    # Переопределяем команду запуска: вместо основного приложения
+    # запускаем класс FlywayMigratorKt с аргументом "migrate"
+    entrypoint: ["java", "-Xms256m", "-Xmx512m", "-cp", "/app/lib/*", "su.itgalley.database.config.migrations.FlywayMigratorKt", "migrate"]
+    environment:
+      # Те же переменные окружения, что и для backend
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: keyldb
+      DB_USER: user
+      DB_PASSWORD: pass
+    depends_on:
+      # Ждём, пока БД не станет здоровой (healthcheck пройдёт)
+      db:
+        condition: service_healthy
+    networks:
+      - keylearning-network
+    # Этот сервис не должен перезапускаться автоматически
+    # Он выполняет свою задачу и завершается
+    restart: "no"
+
+  # ============================================================
+  # СЕРВИС 3: ОСНОВНОЕ ПРИЛОЖЕНИЕ (Kotlin/http4k)
+  # ============================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: keylearning-backend
+    restart: always
+    environment:
+      # Переменные окружения для подключения к БД
+      # DB_HOST=db — это имя сервиса db в docker-compose network
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: keyldb
+      DB_USER: user
+      DB_PASSWORD: pass
+    ports:
+      # Пробрасываем порт 8228 на хост-машину
+      - "8228:8228"
+    depends_on:
+      # Ждём, пока миграции успешно завершатся
+      backend-migrate:
+        condition: service_completed_successfully
+    networks:
+      - keylearning-network
+    # Ограничиваем ресурсы, чтобы не съесть всю память VPS
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  # ============================================================
+  # СЕРВИС 4: ФРОНТЕНД (Node.js)
+  # ============================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: ghcr.io/rob-kost/key-learning/frontend:latest
+    container_name: keylearning-frontend
+    restart: always
+    ports:
+      # Пробрасываем порт 3000 на хост-машину
+      - "3000:3000"
+    depends_on:
+      # Фронтенд может стартовать сразу, но лучше подождать бэкенд
+      backend:
+        condition: service_started
+    networks:
+      - keylearning-network
+    # Ограничиваем ресурсы
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+# ============================================================
+# СЕТИ
+# ============================================================
+networks:
+  keylearning-network:
+    driver: bridge
+
+# ============================================================
+# ТОМА (Volumes)
+# ============================================================
+volumes:
+  # Именованный том для данных MariaDB
+  # Данные сохраняются даже при удалении контейнера
+  mariadb_data:
+    driver: local

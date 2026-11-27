@@ -1,0 +1,20 @@
+# .dockerignore для FRONTEND
+
+# локальные node_modules
+node_modules/
+
+# Результаты локальных тестов
+coverage/
+
+# Настройки IDE
+.idea/
+*.iml
+
+# История Git
+.git/
+.gitignore
+
+# Системный мусор
+.DS_Store
+Thumbs.db
+*.log

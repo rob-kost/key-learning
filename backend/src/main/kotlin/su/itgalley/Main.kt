@@ -22,13 +22,15 @@ import su.itgalley.database.seed.InputBlock
 import su.itgalley.database.seed.convertBlocksToSeedData
 import java.io.File
 import java.util.Properties
+import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.server.Server
 
 fun main() {
     val config = loadDatabaseConfig()
     DatabaseConfig.init(config, validateSchema = true)
 
     val daoRegistry = createDaoRegistry()
-    convertAndGenerateSeedData()
+    //convertAndGenerateSeedData() // раскомментируем только для при добавлении нового контента
 
     val seeder = DatabaseSeeder(daoRegistry)
     seeder.seed()
@@ -51,7 +53,7 @@ private fun loadDatabaseConfig(): DbConfig {
         default: String? = null,
     ): String {
         return System.getenv(envVar) ?: loadFromFileOrNull()?.getProperty(propertyKey) ?: default
-            ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
+        ?: error("Either $envVar environment variable or $propertyKey in app.properties must be set")
     }
 
     val dbHost = getValue("DB_HOST", "db.host", "localhost")
@@ -143,7 +145,14 @@ private fun startServer(daoRegistry: DaoRegistry) {
             levelHelpDao,
         )
     val port = 8228
-    val server = app.asServer(Jetty(port)).start()
-    println("Server started on http://localhost:$port/")
+    val server = app.asServer(
+        Jetty(port, { jettyServer: Server ->
+            ServerConnector(jettyServer).apply {
+                host = "0.0.0.0"
+                this.port = port
+            }
+        })
+    ).start()
+    println("Server started on http://0.0.0.0:$port/")
     server.block()
 }

@@ -1,0 +1,25 @@
+# .dockerignore для BACKEND
+
+# Результаты локальных сборок Gradle
+build/
+.gradle/
+.kotlin/
+
+# Настройки IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Локальный конфиг
+app.properties
+
+# История Git
+.git/
+.gitignore
+
+# Системный мусор.
+.DS_Store
+Thumbs.db
+*.log
