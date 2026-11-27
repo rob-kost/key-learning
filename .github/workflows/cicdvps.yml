@@ -85,8 +85,8 @@ jobs:
   deploy:
     name: Build, Push & Deploy
     needs: [test-backend, test-frontend]
-    # TODO: ВАЖНО: перед мерджем в main замените docker-settings-branch на main
-    if: github.event_name == 'push' && github.ref == 'refs/heads/docker-settings-branch'
+    # TODO: ВАЖНО: в этом месте указывется ветка, которая "владеет' деплоем
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
