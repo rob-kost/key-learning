@@ -86,7 +86,7 @@ jobs:
     name: Build, Push & Deploy
     needs: [test-backend, test-frontend]
     # TODO: ВАЖНО: в этом месте указывется ветка, которая "владеет' деплоем
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/after-beta'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
